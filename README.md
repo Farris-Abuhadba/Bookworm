@@ -1,61 +1,30 @@
 # Bookworm - Light Novel and Manga Reader
-## Run Backend
 
-Clone the project
+## Installation
+
+### Clone the project
 
 ```bash
   git clone https://github.com/Farris-Abuhadba/bookworm.git
 ```
 
-Go to the backend directory
+### Setup Backend
 
 ```bash
-  cd backend
+  cd backend  # Go to backend
+
+  python -m venv name_of_your_venv  # Create Virtual Environment
+  .\name_of_your_venv\Scripts\activate.bat  # Activate Venv
+  pip install -r requirements.txt  # Install dependencies
+
+  uvicorn main:app --reload  # Start backend
 ```
-Create Virtual Environment
+
+### Setup Frontend
 
 ```bash
-  python -m venv name_of_your_venv
+  cd frontend  # Go to frontend
+
+  npm install  # Install dependencies
+  npm run dev  # Start frontend
 ```
-
-Activate Venv
-
-```bash
-Inside of your backend file in a terminal
-.\name_of_your_venv\Scripts\activate.bat
-```
-
-Install dependencies
-
-```bash
-  pip install -r requirements.txt
-```
-
-Start the server
-
-```bash
-  uvicorn main:app --reload
-```
-
-## Run Frontend
-
-
-Go to the frontend directory
-
-```bash
-  cd frontend
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Start the server
-
-```bash
-  npm run dev
-```
-
-

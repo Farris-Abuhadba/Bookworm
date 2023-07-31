@@ -1,2 +1,5 @@
 /.vscode
-/BookWormVenv
+
+# === Backend ===
+/backend/BookWormVenv
+/backend/**/__pycache__
