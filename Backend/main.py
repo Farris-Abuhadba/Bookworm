@@ -31,3 +31,8 @@ async def Chapter(chapter, ln):
 @app.get("/hot-novels")
 async def Featured(topicId):
     return lightNovel.miscScraper(topicId)
+
+
+@app.get("/search")
+async def searched(keyword, page):
+    return lightNovel.searchScraper(keyword, page)

@@ -16,7 +16,6 @@ export default function LightNovels() {
     },
     {enabled: Boolean(router.isReady), refetchOnWindowFocus: false}
   )
-  console.log(novelName)
 
   return (
     <div className='bg-purple-800 h-screen'>
