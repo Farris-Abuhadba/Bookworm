@@ -52,9 +52,9 @@ class Scraper:
         for title in searchedNovels:
             href = title.find("a")["href"]
             novelLinks.append(href)
-        url2 = f"https://novelusb.com/search?keyword={keyword}"
-        req2 = scraper.get(url2)
-        soup2 = BeautifulSoup(req2.content, "html.parser")
-        link = soup2.find("a", {"class": "last"})
-        print(link)
+        last = soup.find(class_="last").find("a")["href"]
+        queries = last.split("&")
+        for query in queries:
+            if "page" in query:
+                pageNumber = int(query.split("=")[-1])
         return [novelLinks, pageNumber]

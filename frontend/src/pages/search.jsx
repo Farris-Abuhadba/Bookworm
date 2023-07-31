@@ -9,7 +9,7 @@ export default function NovelList() {
   const [activePage, setActivePage] = useState(1);
   const [isSearching, setIsSearching] = useState(false);
 
-  const { data: searchedNovels, isLoading, refetch } = useQuery(
+  const { data: searchedNovels, pageNumber, isLoading, refetch,  } = useQuery(
     ['search-novels', value],
     async () => {
       setIsSearching(true);
@@ -37,7 +37,7 @@ export default function NovelList() {
         <div>
           {searchedNovels &&
             searchedNovels.map((novel, index) => {
-            novel = novel.split('/').pop();
+                novel = novel[0].split('/').pop();
               return (
                 <div key={index}>
                   <Link href={`/novel/${novel}`}>
@@ -49,7 +49,7 @@ export default function NovelList() {
         </div>
       )}
 
-      <Pagination value={activePage} onChange={setActivePage} total={3} />
+      <Pagination value={activePage} onChange={setActivePage} total={novel[1]} />
     </div>
   );
 }
