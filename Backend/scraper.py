@@ -57,4 +57,4 @@ class Scraper:
         for query in queries:
             if "page" in query:
                 pageNumber = int(query.split("=")[-1])
-        return [novelLinks, pageNumber]
+        return novelLinks, pageNumber
