@@ -36,3 +36,8 @@ async def Featured(topicId):
 @app.get("/search")
 async def searched(keyword, page):
     return lightNovel.searchScraper(keyword, page)
+
+
+@app.get("/test")
+async def Test():
+    return "test"
