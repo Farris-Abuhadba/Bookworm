@@ -6,18 +6,47 @@ scraper = cloudscraper.create_scraper()
 
 
 class Scraper:
-    def linkScraper(self, ln):
+    def novelScraper(self, ln):
+        url = f"https://novelusb.com/novel-book/{ln}-novel"
+        req = scraper.get(url)
+        soup = BeautifulSoup(req.content, "html.parser")
+
+        data = {}
+
+        infoList = soup.find_all("ul")[5].find_all("li")
+        if "Author:" not in infoList[0].text:
+            infoList.pop(0)
+
+        data["title"] = soup.find("h3", class_="title").text
+        data["cover"] = soup.find_all("img")[1]["src"]
+        data["author"] = infoList[0].find("a").text
+
+        genresA = infoList[1].find_all("a")
+        genres = []
+        for a in genresA:
+            genres.append(a.text)
+        data["genres"] = genres
+
+        data["status"] = infoList[-1].find("a").text
+        data["rating"] = float(soup.find("span", itemprop="ratingValue").text) / 2
+        
+        return data
+
+    def chapterListScraper(self, ln):
         url = f"https://novelusb.com/ajax/chapter-archive?novelId={ln}"
         req = scraper.get(url)
         soup = BeautifulSoup(req.content, "html.parser")
 
-        chapLinks = []
-        links = soup.find_all("a", href=True)
+        chapters = []
+        links = soup.find_all("a")
         for link in links:
-            href = link["href"]
-            if href.startswith(f"https://novelusb.com/novel-book/{ln}-novel/"):
-                chapLinks.append(href)
-        return chapLinks
+            chapter = {}
+            chapter["title"] = link["title"]
+            chapter["url"] = link["href"]
+            chapter["timestamp"] = 1690000000000
+            chapters.append(chapter)
+
+        return chapters
 
     def pageScraper(self, chap, ln):
         url = f"https://novelusb.com/novel-book/{ln}-novel/{chap}"

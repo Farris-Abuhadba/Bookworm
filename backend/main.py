@@ -20,8 +20,13 @@ app.add_middleware(
 
 @app.get("/light-novel/{ln}")
 async def LnList(ln):
-    return lightNovel.linkScraper(ln)
+    novel = lightNovel.novelScraper(ln)
+    chapters = lightNovel.chapterListScraper(ln)
 
+    novel["chapter_count"] = len(chapters)
+    novel["chapters"] = chapters
+
+    return novel
 
 @app.get("/{ln}/{chapter}")
 async def Chapter(chapter, ln):
