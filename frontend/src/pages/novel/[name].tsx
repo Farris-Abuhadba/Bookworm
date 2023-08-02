@@ -1,14 +1,41 @@
-import axios from "axios";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import { Loader, Stack } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
+import RelativeTime from "@yaireo/relative-time";
+import axios from "axios";
+import { useRouter } from "next/router";
+import { BsFileEarmark } from "react-icons/bs";
+import { TiArrowBack } from "react-icons/ti";
+import BookPanel from "../../components/BookPanel";
+import ChapterList from "../../components/ChapterList";
+
+export interface Book {
+    title: string;
+    author: string;
+    cover: string;
+
+    chapter_count: number;
+    views: number;
+    rating: number;
+    status: "Completed" | "On Going" | "Dropped" | "Hiatus";
+
+    genres: string[];
+
+    chapters: Chapter[];
+}
+
+export interface Chapter {
+    title: string;
+    url: string;
+    timestamp: number;
+}
 
 export default function LightNovels() {
     const router = useRouter();
-    const novelName = router.query;
-    const cleanedNovelName = novelName.name?.substring(0, novelName.name?.lastIndexOf("-novel"));
+    const novelName = router.query.name?.toString();
+    if (!novelName) return <h1>Error</h1>;
+    const cleanedNovelName = novelName.substring(0, novelName.lastIndexOf("-novel"));
 
-    const { data: chaptersList, isLoading } = useQuery(
+    const { data: response, isLoading } = useQuery(
         ["novel-chapters"],
         async () => {
             return axios.get(`http://localhost:8000/light-novel/${cleanedNovelName}`);
@@ -17,38 +44,50 @@ export default function LightNovels() {
     );
 
     return (
-        <div className="bg-purple-800 h-screen">
-            <h1>Chapter List for {cleanedNovelName}</h1>
-            <div>
-                {isLoading ? (
-                    <div>Loading....</div>
-                ) : (
-                    <div>
-                        {chaptersList.data.map((chapterTitle, index) => {
-                            const cleanChapterTitle = chapterTitle.substring(
-                                chapterTitle.lastIndexOf("/") + 1
-                            );
-                            return (
-                                <div key={index}>
-                                    <Link
-                                        href={{
-                                            pathname: `/novel/${cleanedNovelName}/${cleanChapterTitle}`,
-                                            query: {
-                                                name: cleanedNovelName,
-                                                chapter: cleanChapterTitle,
-                                            },
-                                        }}
-                                    >
-                                        <div className="bg-white-500 hover:bg-gray-100 hover:text-black">
-                                            {cleanChapterTitle}
-                                        </div>
-                                    </Link>
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
-        </div>
+        <>
+            {isLoading ? (
+                <div className="flex h-screen">
+                    <TiArrowBack
+                        className="absolute m-2 cursor-pointer hover:text-sky-600"
+                        size={32}
+                        onClick={() => {
+                            location.href = "/novel-list";
+                        }}
+                    />
+                    <Loader className="m-auto" size="xl" />
+                </div>
+            ) : (
+                <Stack className="max-w-2/5 w-3/5 min-w-fit container mx-auto mt-5" spacing="xs">
+                    <BookPanel book={response.data} />
+                    <LatestChapter
+                        chapter={response.data.chapters[response.data.chapters.length - 1]}
+                    />
+                    <ChapterList chapters={response.data.chapters} />
+                </Stack>
+            )}
+        </>
     );
 }
+
+interface LatestChapterProps {
+    chapter: Chapter;
+}
+
+const LatestChapter = ({ chapter }: LatestChapterProps) => {
+    return (
+        <div className="p-4 flex justify-between bg-stone-950 rounded-md">
+            <span className="flex flex-none items-center">
+                <BsFileEarmark className="me-2" />
+                Lastest Chapter
+            </span>
+            <span>
+                <a className="underline text-neutral-400 hover:text-neutral-200" href={chapter.url}>
+                    {chapter.title}
+                </a>
+            </span>
+            <span className="text-neutral-400/50">
+                {new RelativeTime().from(new Date(chapter.timestamp))}
+            </span>
+        </div>
+    );
+};
