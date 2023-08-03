@@ -1,7 +1,12 @@
 import { Button, Divider, Group, Image, Stack, Text, Title } from "@mantine/core";
 import { ReactNode } from "react";
-import { BsBook, BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
-import { TiArrowBack } from "react-icons/ti";
+import {
+    TiArrowBack,
+    TiBook,
+    TiStarFullOutline,
+    TiStarHalfOutline,
+    TiStarOutline,
+} from "react-icons/ti";
 import { Book } from "../pages/novel/[name]";
 
 interface Props {
@@ -40,7 +45,7 @@ const BookPanel = ({ book }: Props) => {
 
                     <Group my="1rem" spacing="md">
                         <BookStat title="Chapters">
-                            <BsBook className="me-2" /> {book.chapter_count}
+                            <TiBook className="me-2" /> {book.chapter_count}
                         </BookStat>
                         {/* <BookStat title="Views">
                         <BsEye className="me-2" /> {viewsToString(book.views)}
@@ -124,11 +129,11 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
     return (
         <div className="flex me-2">
             {filledStars.map((_item, index) => {
-                return <BsStarFill key={"filledStar" + index} />;
+                return <TiStarFullOutline key={"filledStar" + index} />;
             })}
-            {Math.round(rating) > Math.floor(rating) && <BsStarHalf />}
+            {Math.round(rating) > Math.floor(rating) && <TiStarHalfOutline />}
             {emptyStars.map((_item, index) => {
-                return <BsStar key={"emptyStar" + index} />;
+                return <TiStarOutline key={"emptyStar" + index} />;
             })}
         </div>
     );

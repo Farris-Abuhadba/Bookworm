@@ -3,8 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import RelativeTime from "@yaireo/relative-time";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { BsFileEarmark } from "react-icons/bs";
-import { TiArrowBack } from "react-icons/ti";
+import { TiArrowBack, TiDocument } from "react-icons/ti";
 import BookPanel from "../../components/BookPanel";
 import ChapterList from "../../components/ChapterList";
 
@@ -77,7 +76,7 @@ const LatestChapter = ({ chapter }: LatestChapterProps) => {
     return (
         <div className="p-4 flex justify-between bg-stone-950 rounded-md">
             <span className="flex flex-none items-center">
-                <BsFileEarmark className="me-2" />
+                <TiDocument className="me-2" />
                 Lastest Chapter
             </span>
             <span>
