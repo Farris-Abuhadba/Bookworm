@@ -61,16 +61,20 @@ class Scraper:
         req = scraper.get(url)
         soup = BeautifulSoup(req.content, "html.parser")
 
-        lightNovelLinks = []
-        hotNovels = soup.find(id=f"{topicId}")
-        links = hotNovels.find_all(
-            "a",
-        )
+        hotNovels = soup.find(id=f"{topicId}").find(class_="index-novel")
+        links = hotNovels.find_all("a")
+
+        novels = []
+
         for link in links:
-            href = link["href"]
-            if href.startswith("https://novelusb.com/novel-book/"):
-                lightNovelLinks.append(href)
-        return lightNovelLinks
+            novel = {}
+            novel["url"] = link["href"]
+            novel["cover"] = link.find("img")["src"]
+            novel["title"] = link["title"]
+            
+            novels.append(novel)
+
+        return novels
 
     def searchScraper(self, keyword, page):
         url = f"https://novelusb.com/search?keyword={keyword}&page={page}"
