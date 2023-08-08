@@ -1,5 +1,5 @@
 import RelativeTime from "@yaireo/relative-time";
-import { Chapter } from "../pages/novel/[name]";
+import { Chapter } from "../types/Novel";
 
 interface Props {
     chapters: Chapter[];
@@ -32,13 +32,13 @@ const ChapterRow = ({ index, chapter }: ChapterRowProps) => {
             <span className="font-bold w-16 text-neutral-400/50">{index}</span>
             <a
                 className="grow underline text-neutral-400 hover:text-neutral-200"
-                href={chapter.url}
+                href={location.href + "/" + chapter.url}
             >
                 {chapter.title}
             </a>
-            <span className="text-right text-neutral-400/50">
+            {/* <span className="text-right text-neutral-400/50">
                 {new RelativeTime().from(new Date(chapter.timestamp))}
-            </span>
+            </span> */}
         </div>
     );
 };

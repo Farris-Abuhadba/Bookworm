@@ -1,8 +1,8 @@
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import Layout from "../components/Layout";
 import "../styles/globals.css";
-import Layout from '../components/Layout'
 const queryClient = new QueryClient();
 
 export default function App(props) {
@@ -20,9 +20,8 @@ export default function App(props) {
                     }}
                 >
                     <Layout>
-                    <Component {...pageProps} />
+                        <Component {...pageProps} />
                     </Layout>
-                  
                 </MantineProvider>
                 <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
