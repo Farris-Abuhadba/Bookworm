@@ -7,13 +7,13 @@ import {
     TiStarHalfOutline,
     TiStarOutline,
 } from "react-icons/ti";
-import { Book } from "../pages/novel/[name]";
+import { Novel } from "../types/Novel";
 
 interface Props {
-    book: Book;
+    novel: Novel;
 }
 
-const BookPanel = ({ book }: Props) => {
+const NovelPanel = ({ novel }: Props) => {
     return (
         <>
             <TiArrowBack
@@ -25,39 +25,39 @@ const BookPanel = ({ book }: Props) => {
             />
             <Group className="bg-stone-950 rounded-md p-4">
                 <Image
-                    className="m-2 rounded-md"
-                    src={book.cover}
+                    className="m-2 rounded-md border border-neutral-500"
+                    src={novel.cover}
                     height={300}
                     width={225}
                     radius="md"
                     withPlaceholder
                 />
                 <div className="m-2">
-                    <Title size="38px">{book.title}</Title>
+                    <Title size="38px">{novel.title}</Title>
                     <div>
                         <span>
                             By{" "}
                             <Text td="underline" className="text-sky-600" component="a" href="/">
-                                {book.author}
+                                {novel.author}
                             </Text>
                         </span>
                     </div>
 
                     <Group my="1rem" spacing="md">
-                        <BookStat title="Chapters">
-                            <TiBook className="me-2" /> {book.chapter_count}
-                        </BookStat>
+                        <NovelStat title="Chapters">
+                            <TiBook className="me-2" /> {novel.chapter_count}
+                        </NovelStat>
                         {/* <BookStat title="Views">
                         <BsEye className="me-2" /> {viewsToString(book.views)}
                     </BookStat> */}
-                        <BookStat title="Rating">
-                            <RatingStars rating={book.rating} /> {book.rating}
-                        </BookStat>
-                        <BookStat title="Status" children={book.status} />
+                        <NovelStat title="Rating">
+                            <RatingStars rating={novel.rating} /> {novel.rating}
+                        </NovelStat>
+                        <NovelStat title="Status" children={novel.status} />
                     </Group>
 
                     <Group my="1rem" spacing={1}>
-                        {book.genres.map((item) => (
+                        {novel.genres.map((item) => (
                             <GenreTag key={item} genre={item} />
                         ))}
                     </Group>
@@ -75,19 +75,28 @@ const BookPanel = ({ book }: Props) => {
     );
 };
 
-export default BookPanel;
+export default NovelPanel;
 
-interface BookStatProps {
+interface NovelStatProps {
     title: string;
     children: ReactNode;
 }
 
-const BookStat = ({ title, children }: BookStatProps) => {
+const NovelStat = ({ title, children }: NovelStatProps) => {
+    var statusColor = "";
+    if (title === "Status") {
+        if (children == "On Going") statusColor = "text-green-500";
+        else if (children == "Completed") statusColor = "text-sky-500";
+        else if (children == "Hiatus") statusColor = "text-yellow-500";
+        else if (children == "Dropped") statusColor = "text-red-500";
+        else statusColor = "text-red-500";
+    }
+
     return (
         <>
             <Stack spacing="xs">
                 <small className="-mb-3">{title}</small>
-                {(title === "Status" && <h5 className="text-green-500">{children}</h5>) || (
+                {(title === "Status" && <h5 className={statusColor}>{children}</h5>) || (
                     <h5 className="flex items-center">{children}</h5>
                 )}
             </Stack>
