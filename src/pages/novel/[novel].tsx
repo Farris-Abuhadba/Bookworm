@@ -1,16 +1,16 @@
-import { Loader, Stack } from "@mantine/core";
+import { Stack } from "@mantine/core";
 import RelativeTime from "@yaireo/relative-time";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { TiArrowBack, TiDocument } from "react-icons/ti";
+import { TiDocument } from "react-icons/ti";
 import ChapterList from "../../components/ChapterList";
+import LoadingScreen from "../../components/LoadingScreen";
 import BookPanel from "../../components/NovelPanel";
 import { Chapter, Novel } from "../../types/Novel";
-import LoadingScreen from "../../components/LoadingScreen";
 
 export default function NovelPage() {
     const router = useRouter();
-    const novelName = router.query.name?.toString();
+    const novelName = router.query.novel?.toString();
     const cleanedNovelName = novelName?.substring(0, novelName.lastIndexOf("-novel"));
 
     const [novel, setNovel] = useState<Novel | null>(null);

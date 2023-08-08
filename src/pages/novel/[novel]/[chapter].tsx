@@ -5,13 +5,13 @@ import { Chapter } from "../../../types/Novel";
 
 export default function ChapterContent() {
     const router = useRouter();
-    const { name, chapter } = router.query;
+    const { novel, chapter } = router.query;
 
     const [chapterData, setChapterData] = useState<Chapter>();
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`/api/chapter?novel=${name}&chapter=${chapter}`)
+        fetch(`/api/chapter?novel=${novel}&chapter=${chapter}`)
             .then((response) => response.json())
             .then((data) => {
                 setChapterData(data);
@@ -21,9 +21,9 @@ export default function ChapterContent() {
                 console.error("Error fetching novel data:", error);
                 setIsLoading(false);
             });
-    }, [name, chapter]);
+    }, [novel, chapter]);
 
-    if (isLoading) return <LoadingScreen backUrl={"/novel/" + name} />;
+    if (isLoading) return <LoadingScreen backUrl={"/novel/" + novel} />;
 
     return (
         <div className="bg-neutral-950 w-3/5 m-5 mx-auto rounded-md p-4 px-7">
