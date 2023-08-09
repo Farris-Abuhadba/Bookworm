@@ -18,7 +18,7 @@ export default function NovelPage() {
 
     useEffect(() => {
         if (cleanedNovelName) {
-            fetch(`/api/novel?name=${cleanedNovelName}`)
+            fetch(`/api/novel?id=${cleanedNovelName}`)
                 .then((response) => response.json())
                 .then((data) => {
                     setNovel(data);
