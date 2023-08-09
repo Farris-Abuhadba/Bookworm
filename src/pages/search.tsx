@@ -1,59 +1,74 @@
 import { Button, Pagination, TextInput } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function NovelList() {
-    const [value, setValue] = useState("");
-    const [activePage, setActivePage] = useState(1);
-    const [isSearching, setIsSearching] = useState(false);
-    const [totalPages, setTotalPages] = useState(1);
+  const [searchValue, setSearchValue] = useState("");
+  const [activePage, setActivePage] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
+  const [novels, setNovels] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
 
-    const {
-        data: searchedNovels,
-        isLoading,
-        refetch,
-    } = useQuery(
-        ["search-novels", value, activePage],
-        async () => {
-            setIsSearching(true);
-            const response = await axios.get(
-                `http://localhost:8000/search?keyword=${value}&page=${activePage}`
-            );
-            setIsSearching(false);
-            setTotalPages(response.data[1]);
-            return response.data[0];
-        },
-        { enabled: false }
-    );
+  const fetchSearchedNovels = async (keyword, pageNumber) => {
+    try {
+      setIsSearching(true);
+      const response = await fetch(
+        `/api/search?keyword=${keyword}&pageNumber=${pageNumber}`
+      );
+      const data = await response.json();
+      setNovels(data.novelLinks);
+      setTotalPages(data.nextPageNumber);
+      setIsSearching(false);
+    } catch (error) {
+      console.error("Error fetching novel data:", error);
+      setIsSearching(false);
+    }
+  };
 
-    useEffect(() => {
-        refetch();
-    }, [value, activePage]);
+  const handleSearch = () => {
+    setActivePage(1);
+    fetchSearchedNovels(searchValue, 1);
+  };
 
-    return (
+  const handlePageChange = (newPage) => {
+    setActivePage(newPage);
+    fetchSearchedNovels(searchValue, newPage);
+  };
+
+  useEffect(() => {
+    fetchSearchedNovels(searchValue, activePage);
+  }, [searchValue, activePage]);
+
+  return (
+    <div>
+      <TextInput
+        value={searchValue}
+        onChange={(event) => setSearchValue(event.currentTarget.value)}
+      />
+      <Button onClick={handleSearch} disabled={isSearching || !searchValue}>
+        Search
+      </Button>
+      {isSearching ? (
+        <div>Loading....</div>
+      ) : novels.length === 0 ? (
+        <div>No results found.</div>
+      ) : (
         <div>
-            <TextInput value={value} onChange={(event) => setValue(event.currentTarget.value)} />
-            <Button onClick={() => refetch()} disabled={isLoading || isSearching}>
-                Search
-            </Button>
-            {isLoading ? (
-                <div>Loading....</div>
-            ) : (
-                <div>
-                    {searchedNovels &&
-                        searchedNovels.map((novel, index) => {
-                            novel = novel.split("/").pop();
-                            return (
-                                <div key={index}>
-                                    <Link href={`/novel/${novel}`}>{novel}</Link>
-                                </div>
-                            );
-                        })}
-                </div>
-            )}
-            <Pagination value={activePage} onChange={setActivePage} total={totalPages} />
+          {novels.map((novel, index) => {
+            const novelName = novel.split("/").pop();
+            return (
+              <div key={index}>
+                <Link href={`/novel/${novelName}`}>{novelName}</Link>
+              </div>
+            );
+          })}
         </div>
-    );
+      )}
+      <Pagination
+        value={activePage}
+        onChange={handlePageChange}
+        total={totalPages}
+      />
+    </div>
+  );
 }
