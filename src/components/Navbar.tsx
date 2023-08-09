@@ -123,10 +123,10 @@ const BookwormSvg = () => {
                 fill="#EF9EB0"
                 d="M17 2v-.05h-.05V2H17Zm3 0h.05v-.05H20V2Zm0 1v.05h.05V3H20Zm-3 0h-.05v.05H17V3Zm0-.95h3v-.1h-3v.1ZM19.95 2v1h.1V2h-.1Zm.05.95h-3v.1h3v-.1ZM17.05 3V2h-.1v1h.1Z"
             />
-            <path stroke="#FFB0C1" stroke-width=".1" d="M17 10h3" />
-            <path stroke="#FA9EB2" stroke-width=".1" d="M17 8h3" />
-            <path stroke="#F28CA2" stroke-width=".1" d="M17 6h3" />
-            <path stroke="#E87D94" stroke-width=".1" d="M17 4h3" />
+            <path stroke="#FFB0C1" strokeWidth=".1" d="M17 10h3" />
+            <path stroke="#FA9EB2" strokeWidth=".1" d="M17 8h3" />
+            <path stroke="#F28CA2" strokeWidth=".1" d="M17 6h3" />
+            <path stroke="#E87D94" strokeWidth=".1" d="M17 4h3" />
             <defs>
                 <linearGradient
                     id="a"
@@ -136,8 +136,8 @@ const BookwormSvg = () => {
                     y2="10.5"
                     gradientUnits="userSpaceOnUse"
                 >
-                    <stop stop-color="#F4B9CB" />
-                    <stop offset="1" stop-color="#FFD9E0" />
+                    <stop stopColor="#F4B9CB" />
+                    <stop offset="1" stopColor="#FFD9E0" />
                 </linearGradient>
             </defs>
         </svg>
