@@ -1,10 +1,9 @@
+import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
-import puppeteer, { executablePath } from "puppeteer";
 import { Chapter } from "../../types/Novel";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const novelId = req.query.novel;
-    const chapterId = req.query.chapter;
+    const { novelId, chapterId } = req.query;
     console.log(req.query);
 
     if (novelId == undefined || chapterId == undefined) {
@@ -12,36 +11,21 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         return;
     }
 
-    const browser = await puppeteer.launch({
-        executablePath: executablePath(),
-        headless: "new",
-    });
-
     try {
-        const page = await browser.newPage();
+        const response = await fetch(`https://novelusb.com/novel-book/${novelId}/${chapterId}`);
+        const document = new JSDOM(await response.text()).window.document;
 
-        const chapterUrl = `https://novelusb.com/novel-book/${novelId}/${chapterId}`;
-        await page.goto(chapterUrl);
+        var title = document.querySelector("a.chr-title").textContent;
 
-        await page.waitForSelector("#chr-content p");
-
-        const title = await page.$eval("a.chr-title", (a) => {
-            return a.textContent;
-        });
-
-        const content = await page.$$eval("#chr-content p", (ps) => {
-            var content = [];
-
-            ps.forEach((p) => {
-                content.push(p.textContent);
-            });
-
-            return content;
+        var content = [];
+        var ps = document.querySelectorAll("#chr-content p");
+        ps.forEach((p) => {
+            content.push(p.textContent);
         });
 
         const chapter: Chapter = {
             title,
-            url: chapterUrl,
+            id: chapterId.toString(),
             content,
         };
 
@@ -50,6 +34,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         console.error("An error occurred:", error);
         res.status(500).json({ error: "An error occurred while extracting chapter data." });
     }
-
-    await browser.close();
 };
