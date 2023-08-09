@@ -7,6 +7,9 @@ export default function ChapterContent() {
     const router = useRouter();
     const { novel, chapter } = router.query;
 
+    if (novel == undefined || chapter == undefined)
+        return <LoadingScreen backUrl={"/novel/" + novel} />;
+
     const [chapterData, setChapterData] = useState<Chapter>();
     const [isLoading, setIsLoading] = useState(true);
 
