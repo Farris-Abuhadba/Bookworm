@@ -14,7 +14,7 @@ export default function ChapterContent() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`/api/chapter?novel=${novel}&chapter=${chapter}`)
+        fetch(`/api/chapter?novelId=${novel}&chapterId=${chapter}`)
             .then((response) => response.json())
             .then((data) => {
                 setChapterData(data);

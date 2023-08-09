@@ -50,8 +50,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         var links = chaptersDocument.querySelectorAll("a");
         links.forEach((link) => {
             let title = link.textContent;
-            let url = link.href;
-            chapters.push({ title, url });
+            let id = link.href.split("/").slice(-1);
+            chapters.push({ title, id });
         });
 
         chapters[chapters.length - 1].timestamp = info["last_update"];
@@ -59,7 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const novel: Novel = {
             title: info["title"],
             cover: info["cover"],
-            url: `https://novelusb.com/novel-book/${novelId}-novel`,
+            id: novelId.toString(),
             chapter_count: chapters.length,
             author: info["author"],
             genres: info["genres"],
