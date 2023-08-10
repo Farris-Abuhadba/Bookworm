@@ -1,32 +1,33 @@
-import { Button, Pagination, TextInput } from "@mantine/core";
+import React, { useState, useEffect } from "react";
+import { Pagination, TextInput } from "@mantine/core";
+import { useRouter } from "next/router";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-export default function NovelList() {
+const Search = () => {
+  const router = useRouter();
+
   const [searchValue, setSearchValue] = useState("");
   const [activePage, setActivePage] = useState(1);
-  const [isSearching, setIsSearching] = useState(false);
   const [novels, setNovels] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [showImages, setShowImages] = useState(false);
 
   const fetchSearchedNovels = async (keyword, pageNumber) => {
     try {
-      setIsSearching(true);
       const response = await fetch(
         `/api/search?keyword=${keyword}&pageNumber=${pageNumber}`
       );
       const data = await response.json();
-      setNovels(data.novelLinks);
+      setNovels(data.novels);
       setTotalPages(data.nextPageNumber);
-      setIsSearching(false);
     } catch (error) {
       console.error("Error fetching novel data:", error);
-      setIsSearching(false);
     }
   };
 
   const handleSearch = () => {
     setActivePage(1);
+    setShowImages(true);
     fetchSearchedNovels(searchValue, 1);
   };
 
@@ -36,7 +37,11 @@ export default function NovelList() {
   };
 
   useEffect(() => {
-    fetchSearchedNovels(searchValue, activePage);
+    if (!searchValue) {
+      setNovels([]);
+    } else {
+      fetchSearchedNovels(searchValue, activePage);
+    }
   }, [searchValue, activePage]);
 
   return (
@@ -44,31 +49,38 @@ export default function NovelList() {
       <TextInput
         value={searchValue}
         onChange={(event) => setSearchValue(event.currentTarget.value)}
+        placeholder="Search for novels"
       />
-      <Button onClick={handleSearch} disabled={isSearching || !searchValue}>
+      <button onClick={handleSearch} disabled={!searchValue}>
         Search
-      </Button>
-      {isSearching ? (
-        <div>Loading....</div>
-      ) : novels.length === 0 ? (
-        <div>No results found.</div>
-      ) : (
-        <div>
-          {novels.map((novel, index) => {
-            const novelName = novel.split("/").pop();
-            return (
-              <div key={index}>
-                <Link href={`/novel/${novelName}`}>{novelName}</Link>
-              </div>
-            );
-          })}
-        </div>
+      </button>
+      <div>
+        {novels.map((novel, index) => {
+          const novelName = novel.link.split("/").pop();
+          return (
+            <div key={index}>
+              <Link href={`/novel/${novelName}`}>
+                {showImages && (
+                  <div>
+                    <img src={novel.img} alt={novel.title} />
+                    <div>{novel.title}</div>
+                  </div>
+                )}
+                {!showImages && <div>{novel.title}</div>}
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+      {showImages && (
+        <Pagination
+          value={activePage}
+          onChange={handlePageChange}
+          total={totalPages}
+        />
       )}
-      <Pagination
-        value={activePage}
-        onChange={handlePageChange}
-        total={totalPages}
-      />
     </div>
   );
-}
+};
+
+export default Search;

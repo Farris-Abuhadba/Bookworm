@@ -1,50 +1,42 @@
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import fetch from "node-fetch";
+import { JSDOM } from "jsdom";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { keyword, pageNumber } = req.query;
 
-  puppeteer.use(StealthPlugin());
-
   try {
-    const browser = await puppeteer.launch({ headless: true });
-    const browserPage = await browser.newPage();
-
     const url = `https://novelusb.com/search?keyword=${keyword}&page=${pageNumber}`;
-    await browserPage.goto(url);
+    const response = await fetch(url);
+    const document = new JSDOM(await response.text()).window.document;
 
-    // Wait until the page is fully loaded
-    await browserPage.waitForSelector("h3.novel-title > a");
+    const novelItems = document.querySelectorAll(
+      ".col-novel-main .list-novel .row"
+    ) as NodeListOf<Element>;
 
-    const novelLinks = await browserPage.evaluate(() => {
-      const links = [];
-      const searchedNovels = document.querySelectorAll("h3.novel-title > a");
-      searchedNovels.forEach((title) => {
-        const href = title.getAttribute("href");
-        if (href) {
-          links.push(href);
+    const novels = Array.from(novelItems).map((item) => {
+      const titleElement = item.querySelector(".novel-title > a");
+      const imgElement = item.querySelector(".cover");
+      return {
+        title: titleElement?.textContent,
+        img: imgElement?.getAttribute("src"),
+        link: titleElement?.getAttribute("href"),
+      };
+    });
+
+    const lastLink = document.querySelector(".last > a");
+    let nextPageNumber = 1;
+    if (lastLink) {
+      const lastHref = lastLink.getAttribute("href");
+      const queries = lastHref?.split("&");
+      queries?.forEach((query) => {
+        if (query.includes("page")) {
+          nextPageNumber = parseInt(query.split("=")[1]);
         }
       });
-      return links;
-    });
+    }
 
-    const nextPageNumber = await browserPage.evaluate(() => {
-      const lastLink = document.querySelector(".last > a");
-      let nextPage = 1;
-      if (lastLink) {
-        const lastHref = lastLink.getAttribute("href");
-        const queries = lastHref?.split("&");
-        queries?.forEach((query) => {
-          if (query.includes("page")) {
-            nextPage = parseInt(query.split("=")[1]);
-          }
-        });
-      }
-      return nextPage;
-    });
-
-    await browser.close();
-    res.status(200).json({ novelLinks, nextPageNumber });
+    res.status(200).json({ novels, nextPageNumber });
   } catch (error) {
     console.error("An error occurred:", error);
     res

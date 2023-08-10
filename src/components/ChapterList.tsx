@@ -32,7 +32,7 @@ const ChapterRow = ({ index, chapter }: ChapterRowProps) => {
             <span className="font-bold w-16 text-neutral-400/50">{index}</span>
             <a
                 className="grow underline text-neutral-400 hover:text-neutral-200"
-                href={location.href + "/" + chapter.url}
+                href={location.href + "/" + chapter.id}
             >
                 {chapter.title}
             </a>
