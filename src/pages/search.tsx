@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Pagination, TextInput } from "@mantine/core";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 const Search = () => {
   const router = useRouter();
@@ -10,11 +11,6 @@ const Search = () => {
   const [novels, setNovels] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [showImages, setShowImages] = useState(false);
-
-  useEffect(() => {
-    const showImagesFromQuery = router.query.showImages === "true";
-    setShowImages(showImagesFromQuery);
-  }, [router.query.showImages]);
 
   const fetchSearchedNovels = async (keyword, pageNumber) => {
     try {
@@ -31,7 +27,7 @@ const Search = () => {
 
   const handleSearch = () => {
     setActivePage(1);
-    router.push({ pathname: router.pathname, query: { showImages: "true" } });
+    setShowImages(true);
     fetchSearchedNovels(searchValue, 1);
   };
 
@@ -48,11 +44,6 @@ const Search = () => {
     }
   }, [searchValue, activePage]);
 
-  const navigateToNovelPage = (name) => {
-    const novelPageLink = `/novel/${name.replace(/\s/g, "-")}`;
-    router.push(novelPageLink);
-  };
-
   return (
     <div>
       <TextInput
@@ -63,17 +54,24 @@ const Search = () => {
       <button onClick={handleSearch} disabled={!searchValue}>
         Search
       </button>
-      {novels.map((novel, index) => (
-        <div key={index} onClick={() => navigateToNovelPage(novel.title)}>
-          {showImages && (
-            <div>
-              <img src={novel.img} alt={novel.title} />
-              <div>{novel.title}</div>
+      <div>
+        {novels.map((novel, index) => {
+          const novelName = novel.link.split("/").pop();
+          return (
+            <div key={index}>
+              <Link href={`/novel/${novelName}`}>
+                {showImages && (
+                  <div>
+                    <img src={novel.img} alt={novel.title} />
+                    <div>{novel.title}</div>
+                  </div>
+                )}
+                {!showImages && <div>{novel.title}</div>}
+              </Link>
             </div>
-          )}
-          {!showImages && <div>{novel.title}</div>}
-        </div>
-      ))}
+          );
+        })}
+      </div>
       {showImages && (
         <Pagination
           value={activePage}

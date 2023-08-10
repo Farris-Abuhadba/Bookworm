@@ -1,30 +1,30 @@
 import fetch from "node-fetch";
-import { parse } from "node-html-parser";
+import { JSDOM } from "jsdom";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default async (req, res) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { keyword, pageNumber } = req.query;
 
   try {
     const url = `https://novelusb.com/search?keyword=${keyword}&page=${pageNumber}`;
     const response = await fetch(url);
-    const html = await response.text();
+    const document = new JSDOM(await response.text()).window.document;
 
-    const root = parse(html);
-
-    const novelItems = root.querySelectorAll(
+    const novelItems = document.querySelectorAll(
       ".col-novel-main .list-novel .row"
-    );
-    const novels = novelItems.map((item) => {
+    ) as NodeListOf<Element>;
+
+    const novels = Array.from(novelItems).map((item) => {
       const titleElement = item.querySelector(".novel-title > a");
       const imgElement = item.querySelector(".cover");
       return {
-        title: titleElement?.text,
+        title: titleElement?.textContent,
         img: imgElement?.getAttribute("src"),
         link: titleElement?.getAttribute("href"),
       };
     });
 
-    const lastLink = root.querySelector(".last > a");
+    const lastLink = document.querySelector(".last > a");
     let nextPageNumber = 1;
     if (lastLink) {
       const lastHref = lastLink.getAttribute("href");
