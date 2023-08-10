@@ -1,6 +1,6 @@
 export interface Novel {
     title: string;
-    url: string;
+    id: string;
 
     author?: string;
     cover?: string;
@@ -17,7 +17,7 @@ export interface Novel {
 
 export interface Chapter {
     title: string;
-    url: string;
+    id: string;
 
     content?: string[];
 
