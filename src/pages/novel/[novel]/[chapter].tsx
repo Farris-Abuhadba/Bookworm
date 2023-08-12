@@ -1,32 +1,39 @@
-import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter } from "../../../types/Novel";
+import { useRouter } from "next/router";
 
 export default function ChapterContent() {
+
   const router = useRouter();
   const { novel, chapter } = router.query;
+  const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  if (novel == undefined || chapter == undefined)
-    return <LoadingScreen backUrl={"/novel/" + novel} />;
+  if (novel == undefined || currentChapter == undefined)
+      return <LoadingScreen backUrl={"/novel/" + novel} />;
 
   const [chapterData, setChapterData] = useState<Chapter>();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/chapter?novelId=${novel}&chapterId=${chapter}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setChapterData(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching novel data:", error);
-        setIsLoading(false);
-      });
-  }, [novel, chapter]);
+      localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
+      console.log(`lastReadChapter_${novel}`, currentChapter);
+
+      fetch(`/api/chapter?novelId=${novel}&chapterId=${currentChapter}`)
+          .then((response) => response.json())
+          .then((data) => {
+              setChapterData(data);
+              setIsLoading(false);
+          })
+          .catch((error) => {
+              console.error("Error fetching chapter data:", error);
+              setIsLoading(false);
+          });
+  }, [novel, currentChapter]);
+
 
   if (isLoading) return <LoadingScreen backUrl={"/novel/" + novel} />;
+
 
   const parts = (chapter as string).split("-");
   const nextChapter = parts[0] + "-" + (parseInt(parts[1], 10) + 1);

@@ -40,7 +40,7 @@ export default function NovelList() {
             </Title>
             <div className="flex flex-wrap justify-center">
                 {novels.map((novel, index) => {
-                    const novelSlug = novel.url.split("/").pop();
+                    const novelSlug = novel.id;
                     return (
                         <Link key={index} href={`/novel/${novelSlug}`} className="m-1">
                             <NovelCard title={novel.title} image={novel.cover} />

@@ -1,5 +1,5 @@
 import { Button, Divider, Group, Image, Stack, Text, Title } from "@mantine/core";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
     TiArrowBack,
     TiBook,
@@ -14,6 +14,15 @@ interface Props {
 }
 
 const NovelPanel = ({ novel }: Props) => {
+    const [lastRead, setLastRead] = useState(novel.chapters[0].id);
+
+    useEffect(() => {
+        console.log(`lastReadChapter_${novel.id}`);
+        const storage = localStorage.getItem(`lastReadChapter_${novel.id}`);
+        console.log(storage);
+        if (storage) setLastRead(storage);
+    }, [novel]);
+
     return (
         <>
             <TiArrowBack
@@ -62,7 +71,14 @@ const NovelPanel = ({ novel }: Props) => {
                         ))}
                     </Group>
 
-                    <Button className="me-2 bg-sky-600">Read</Button>
+                    <Button
+                        className="me-2 bg-sky-600"
+                        onClick={() => {
+                            location.href += "/" + lastRead;
+                        }}
+                    >
+                        Read
+                    </Button>
                     {/* <Button
                     className="border-neutral-400 text-neutral-400 hover:bg-neutral-400/25"
                     variant="outline"
