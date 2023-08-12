@@ -59,7 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const novel: Novel = {
             title: info["title"],
             cover: info["cover"],
-            id: novelId.toString(),
+            id: novelId.toString() + "-novel",
             chapter_count: chapters.length,
             author: info["author"],
             genres: info["genres"],
