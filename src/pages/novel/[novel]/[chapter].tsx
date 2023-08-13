@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { TiArrowLeft, TiArrowRight, TiCog, TiThMenu } from "react-icons/ti";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
+import { useQuery } from "react-query";
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -13,12 +14,8 @@ export default function ChapterContent() {
   if (novel == undefined || currentChapter == undefined)
     return <LoadingScreen backUrl={"/novel/" + novel} />;
 
-  const [chapterData, setChapterData] = useState<Chapter>();
-  const [isLoading, setIsLoading] = useState(true);
-
   let savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
   if (Number.isNaN(savedFontSize)) savedFontSize = 2;
-  console.log(fontSizes, savedFontSize);
   const [fontSize, setFontSize] = useState<string>(
     fontSizes[savedFontSize].tailwind
   );
@@ -27,20 +24,15 @@ export default function ChapterContent() {
   if (Number.isNaN(savedPadding)) savedPadding = 4;
   const [padding, setPadding] = useState<string>("my-" + savedPadding);
 
-  useEffect(() => {
-    localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
+  localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
 
-    fetch(`/api/chapter?novelId=${novel}&chapterId=${currentChapter}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setChapterData(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching chapter data:", error);
-        setIsLoading(false);
-      });
-  }, [novel, currentChapter]);
+  const { data: chapterData, isLoading } = useQuery(
+    ["chapter", novel, currentChapter],
+    () =>
+      fetch(`/api/chapter?novelId=${novel}&chapterId=${currentChapter}`).then(
+        (response) => response.json()
+      )
+  );
 
   if (isLoading) return <LoadingScreen backUrl={"/novel/" + novel} />;
 
