@@ -17,13 +17,14 @@ export default function ChapterContent() {
   const [isLoading, setIsLoading] = useState(true);
 
   let savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
-  if (savedFontSize == undefined) savedFontSize = 2;
+  if (Number.isNaN(savedFontSize)) savedFontSize = 2;
+  console.log(fontSizes, savedFontSize);
   const [fontSize, setFontSize] = useState<string>(
     fontSizes[savedFontSize].tailwind
   );
 
   let savedPadding = parseInt(localStorage.getItem("settings_padding"));
-  if (savedPadding == undefined) savedPadding = 4;
+  if (Number.isNaN(savedPadding)) savedPadding = 4;
   const [padding, setPadding] = useState<string>("my-" + savedPadding);
 
   useEffect(() => {
@@ -174,10 +175,10 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 
 const ChapterSettings = ({ setFontSize, setPadding }) => {
   var savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
-  if (savedFontSize == undefined) savedFontSize = 2;
+  if (Number.isNaN(savedFontSize)) savedFontSize = 2;
 
   var savedPadding = parseInt(localStorage.getItem("settings_padding"));
-  if (savedPadding == undefined) savedPadding = 4;
+  if (Number.isNaN(savedPadding)) savedPadding = 4;
 
   return (
     <Stack className="items-end" spacing="xl">
