@@ -11,8 +11,7 @@ export default function ChapterContent() {
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  if (novel == undefined || currentChapter == undefined)
-    return <LoadingScreen backUrl={"/novel/" + novel} />;
+  if (!router.isReady) return <LoadingScreen backUrl={"/novel/" + novel} />;
 
   let savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
   if (Number.isNaN(savedFontSize)) savedFontSize = 2;
