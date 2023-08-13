@@ -1,8 +1,9 @@
+import { Button, Group, Image, Stack } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
-import { Button, Group, Image, Stack } from "@mantine/core";
+import { TiArrowLeft, TiArrowRight, TiThMenu } from "react-icons/ti";
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -99,38 +100,37 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 
   return (
     <div className="bg-neutral-950 rounded-md p-4 px-7 flex justify-between">
-      <Button
-        className="me-2 bg-sky-600"
+      <TiArrowLeft
+        size={30}
+        className={`self-center hover:text-sky-600 ${
+          currentChapterIndex - 1 < 0 ? "invisible" : ""
+        }`}
         onClick={() => {
           location.href = `/novel/${novel.id}/${
             novel.chapters[currentChapterIndex - 1].id
           }`;
         }}
-        disabled={currentChapterIndex - 1 < 0}
-      >
-        Prev
-      </Button>
+      />
 
-      <Button
-        className="me-2 bg-sky-600"
+      <TiThMenu
+        size={20}
+        className="self-center hover:text-sky-600"
         onClick={() => {
           location.href = `/novel/${novel.id}`;
         }}
-      >
-        Chapter List
-      </Button>
+      />
 
-      <Button
-        className="me-2 bg-sky-600"
+      <TiArrowRight
+        size={30}
+        className={`self-center hover:text-sky-600 ${
+          novel.chapters.length <= currentChapterIndex + 1 ? "invisible" : ""
+        }`}
         onClick={() => {
           location.href = `/novel/${novel.id}/${
             novel.chapters[currentChapterIndex + 1].id
           }`;
         }}
-        disabled={novel.chapters.length <= currentChapterIndex + 1}
-      >
-        Next
-      </Button>
+      />
     </div>
   );
 };
