@@ -33,6 +33,7 @@ export default function ChapterContent() {
   if (isLoading) return <LoadingScreen backUrl={"/novel/" + novel} />;
 
   const novelData = JSON.parse(localStorage.getItem(novel.toString()));
+  if (!novelData) location.href = "/novel/" + novel;
 
   return (
     <Stack className="w-4/5 mx-auto my-5" spacing="xs">
