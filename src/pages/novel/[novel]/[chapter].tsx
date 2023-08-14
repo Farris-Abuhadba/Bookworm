@@ -1,39 +1,37 @@
 import { Image, NumberInput, Popover, Slider, Stack } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TiArrowLeft, TiArrowRight, TiCog, TiThMenu } from "react-icons/ti";
+import { useQuery } from "react-query";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
-import { useQuery } from "react-query";
 
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  if (!router.isReady) return <LoadingScreen backUrl={"/novel/" + novel} />;
-
-  let savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
-  if (Number.isNaN(savedFontSize)) savedFontSize = 2;
   const [fontSize, setFontSize] = useState<string>(
-    fontSizes[savedFontSize].tailwind
+    fontSizes[getSetting("fontSize", router.isReady, 2)].tailwind
   );
 
-  let savedPadding = parseInt(localStorage.getItem("settings_padding"));
-  if (Number.isNaN(savedPadding)) savedPadding = 4;
-  const [padding, setPadding] = useState<string>("my-" + savedPadding);
+  const [padding, setPadding] = useState<string>(
+    "my-" + getSetting("padding", router.isReady, 4)
+  );
 
-  localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
-
-  const { data: chapterData, isLoading } = useQuery(
-    ["chapter", novel, currentChapter],
-    () =>
+  const { data: chapterData, isLoading } = useQuery({
+    queryKey: ["chapter", novel, currentChapter],
+    queryFn: () =>
       fetch(`/api/chapter?novelId=${novel}&chapterId=${currentChapter}`).then(
         (response) => response.json()
-      )
-  );
+      ),
+    enabled: router.isReady,
+  });
 
-  if (isLoading) return <LoadingScreen backUrl={"/novel/" + novel} />;
+  if (!router.isReady || isLoading)
+    return <LoadingScreen backUrl={"/novel/" + novel} />;
+
+  localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
 
   const novelData = JSON.parse(localStorage.getItem(novel.toString()));
   if (!novelData) location.href = "/novel/" + novel;
@@ -205,6 +203,17 @@ const ChapterSettings = ({ setFontSize, setPadding }) => {
       </div>
     </Stack>
   );
+};
+
+const getSetting = (key: string, ready: boolean, defaultValue) => {
+  let storedValue;
+
+  if (ready) storedValue = parseInt(localStorage.getItem("settings_" + key));
+
+  if (storedValue == undefined || Number.isNaN(storedValue))
+    storedValue = defaultValue;
+
+  return storedValue;
 };
 
 const fontSizes = [
