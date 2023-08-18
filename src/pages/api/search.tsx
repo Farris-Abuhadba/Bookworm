@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const API_Search = async (req: NextApiRequest, res: NextApiResponse) => {
   const { keyword, pageNumber } = req.query;
 
   try {
@@ -44,3 +44,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ error: "An error occurred while searching for novel data." });
   }
 };
+
+export default API_Search;

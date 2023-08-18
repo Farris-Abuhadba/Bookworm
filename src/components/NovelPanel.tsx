@@ -42,6 +42,7 @@ const NovelPanel = ({ novel }: Props) => {
       <Group className="bg-stone-950 rounded-md p-4">
         <Image
           className="m-2 rounded-md border border-neutral-800"
+          alt="Book Cover"
           src={novel.cover}
           height={300}
           width={225}
@@ -74,7 +75,7 @@ const NovelPanel = ({ novel }: Props) => {
             <NovelStat title="Rating">
               <RatingStars rating={novel.rating} /> {novel.rating}
             </NovelStat>
-            <NovelStat title="Status" children={novel.status} />
+            <NovelStat title="Status">{novel.status}</NovelStat>
           </Group>
 
           <Group my="1rem" spacing={1}>

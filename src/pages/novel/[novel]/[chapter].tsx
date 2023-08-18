@@ -78,6 +78,7 @@ const ChapterHeader = ({
       <div className="flex">
         <Image
           className="my-2 rounded-md border border-neutral-800"
+          alt={novel.title}
           src={novel.cover}
           height={100}
           width={75}

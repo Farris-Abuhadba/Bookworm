@@ -1,4 +1,3 @@
-import RelativeTime from "@yaireo/relative-time";
 import { Chapter } from "../types/Novel";
 
 interface Props {

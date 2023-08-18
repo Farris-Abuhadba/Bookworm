@@ -2,7 +2,7 @@ import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Chapter } from "../../types/Novel";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
   const { novelId, chapterId } = req.query;
   console.log(req.query);
 
@@ -39,3 +39,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ error: "An error occurred while extracting chapter data." });
   }
 };
+
+export default API_Chapter;
