@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Pagination, TextInput } from "@mantine/core";
-import { useRouter } from "next/router";
+import { Button, Image, Pagination, TextInput } from "@mantine/core";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { BiSearchAlt2 } from "react-icons/bi";
 
 const Search = () => {
   const router = useRouter();
@@ -45,28 +46,57 @@ const Search = () => {
   }, [searchValue, activePage]);
 
   return (
-    <div>
-      <TextInput
-        value={searchValue}
-        onChange={(event) => setSearchValue(event.currentTarget.value)}
-        placeholder="Search for novels"
-      />
-      <button onClick={handleSearch} disabled={!searchValue}>
-        Search
-      </button>
+    <div className="max-w-2/5 w-3/5 m-5 mx-auto p-4 rounded-md bg-neutral-950 space-y-5">
+      <div className="flex space-x-4 items-center">
+        <BiSearchAlt2 className="text-neutral-500" size={24} />
+
+        <TextInput
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") handleSearch();
+          }}
+          placeholder="Search for novels"
+          className="grow"
+        />
+
+        <Button
+          className="bg-[#1971c2] hover:bg-[#1864ab]"
+          onClick={handleSearch}
+          disabled={!searchValue}
+        >
+          Search
+        </Button>
+      </div>
       <div>
         {novels.map((novel, index) => {
           const novelName = novel.link.split("/").pop();
           return (
             <div key={index}>
-              <Link href={`/novel/${novelName}`}>
+              <Link href={`/novel/${novelName}`} className="flex items-center">
                 {showImages && (
-                  <div>
-                    <img src={novel.img} alt={novel.title} />
-                    <div>{novel.title}</div>
-                  </div>
+                  <>
+                    <Image
+                      className="m-2 w-fit rounded-md border border-neutral-800"
+                      width={200}
+                      height={89}
+                      src={novel.img}
+                      radius="md"
+                      withPlaceholder
+                    />
+                    <span className="text-xl">{novel.title}</span>
+                  </>
                 )}
-                {!showImages && <div>{novel.title}</div>}
+                {!showImages && (
+                  <span
+                    className={
+                      "p-2 rounded-md grow " +
+                      (index % 2 == 0 ? "bg-neutral-900" : "")
+                    }
+                  >
+                    {novel.title}
+                  </span>
+                )}
               </Link>
             </div>
           );
