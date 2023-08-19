@@ -17,17 +17,15 @@ export default function NovelPage() {
     novelName.lastIndexOf("-novel")
   );
 
-  const { data: novel, isLoading } = useQuery(
-    ["novel", cleanedNovelName],
-    async () => {
+  const { data: novel, isLoading } = useQuery({
+    queryKey: ["novel", cleanedNovelName],
+    queryFn: async () => {
       const response = await fetch(`/api/novel?id=${cleanedNovelName}`);
       const data = await response.json();
       return data;
     },
-    {
-      enabled: !!cleanedNovelName,
-    }
-  );
+    enabled: !!cleanedNovelName,
+  });
 
   if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
 
