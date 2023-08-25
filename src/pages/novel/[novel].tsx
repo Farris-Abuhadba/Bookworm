@@ -7,6 +7,7 @@ import ChapterList from "../../components/ChapterList";
 import LoadingScreen from "../../components/LoadingScreen";
 import NovelPanel from "../../components/NovelPanel";
 import { Chapter, Novel } from "../../types/Novel";
+import { useQuery } from "react-query";
 
 export default function NovelPage() {
   const router = useRouter();
@@ -16,27 +17,17 @@ export default function NovelPage() {
     novelName.lastIndexOf("-novel")
   );
 
-  const [novel, setNovel] = useState<Novel | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: novel, isLoading } = useQuery({
+    queryKey: ["novel", cleanedNovelName],
+    queryFn: async () => {
+      const response = await fetch(`/api/novel?id=${cleanedNovelName}`);
+      const data = await response.json();
+      return data;
+    },
+    enabled: !!cleanedNovelName,
+  });
 
-  useEffect(() => {
-    if (cleanedNovelName) {
-      fetch(`/api/novel?id=${cleanedNovelName}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setNovel(data);
-          setIsLoading(false);
-
-          localStorage.setItem(data.id, JSON.stringify(data));
-        })
-        .catch((error) => {
-          console.error("Error fetching novel data:", error);
-          setIsLoading(false);
-        });
-    }
-  }, [cleanedNovelName]);
-
-  if (isLoading) return <LoadingScreen backUrl="/" />;
+  if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
 
   return (
     <Stack className="w-4/5 mx-auto my-5" spacing="xs">

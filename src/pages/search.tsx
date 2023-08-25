@@ -1,49 +1,41 @@
 import { Button, Image, Pagination, TextInput } from "@mantine/core";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BiSearchAlt2 } from "react-icons/bi";
+import { useQuery } from "react-query";
 
 const Search = () => {
-  const router = useRouter();
-
   const [searchValue, setSearchValue] = useState("");
   const [activePage, setActivePage] = useState(1);
-  const [novels, setNovels] = useState([]);
-  const [totalPages, setTotalPages] = useState(1);
   const [showImages, setShowImages] = useState(false);
 
   const fetchSearchedNovels = async (keyword, pageNumber) => {
-    try {
-      const response = await fetch(
-        `/api/search?keyword=${keyword}&pageNumber=${pageNumber}`
-      );
-      const data = await response.json();
-      setNovels(data.novels);
-      setTotalPages(data.nextPageNumber);
-    } catch (error) {
-      console.error("Error fetching novel data:", error);
-    }
+    const response = await fetch(
+      `/api/search?keyword=${keyword}&pageNumber=${pageNumber}`
+    );
+    const data = await response.json();
+    return data;
   };
+
+  const { data, error, isLoading } = useQuery(
+    ["search", searchValue, activePage],
+    () => fetchSearchedNovels(searchValue, activePage),
+    {
+      enabled: !!searchValue,
+    }
+  );
+
+  const novels = data?.novels || [];
+  const totalPages = data?.nextPageNumber || 1;
 
   const handleSearch = () => {
     setActivePage(1);
     setShowImages(true);
-    fetchSearchedNovels(searchValue, 1);
   };
 
   const handlePageChange = (newPage) => {
     setActivePage(newPage);
-    fetchSearchedNovels(searchValue, newPage);
   };
-
-  useEffect(() => {
-    if (!searchValue) {
-      setNovels([]);
-    } else {
-      fetchSearchedNovels(searchValue, activePage);
-    }
-  }, [searchValue, activePage]);
 
   return (
     <div className="max-w-2/5 w-3/5 m-5 mx-auto p-4 rounded-md bg-neutral-950 space-y-5">
