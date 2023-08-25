@@ -1,131 +1,141 @@
-import {
-  Burger,
-  Container,
-  Group,
-  Header,
-  createStyles,
-  rem,
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
+import {
+  BiGridAlt,
+  BiHomeAlt2,
+  BiSearchAlt2,
+  BiSolidGridAlt,
+} from "react-icons/bi";
 
-const useStyles = createStyles((theme) => ({
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: "100%",
-  },
+interface Props {
+  children: ReactNode;
+}
 
-  links: {
-    [theme.fn.smallerThan("xs")]: {
-      display: "none",
-    },
-  },
-
-  burger: {
-    [theme.fn.largerThan("xs")]: {
-      display: "none",
-    },
-  },
-
-  link: {
-    display: "block",
-    lineHeight: 1,
-    padding: `${rem(8)} ${rem(12)}`,
-    borderRadius: theme.radius.sm,
-    textDecoration: "none",
-    color:
-      theme.colorScheme === "dark"
-        ? theme.colors.dark[0]
-        : theme.colors.gray[7],
-    fontSize: theme.fontSizes.sm,
-    fontWeight: 500,
-
-    "&:hover": {
-      backgroundColor:
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[6]
-          : theme.colors.gray[0],
-    },
-  },
-
-  linkActive: {
-    "&, &:hover": {
-      backgroundColor: theme.fn.variant({
-        variant: "light",
-        color: theme.primaryColor,
-      }).background,
-      color: theme.fn.variant({ variant: "light", color: theme.primaryColor })
-        .color,
-    },
-  },
-}));
-
-const links = [
-  {
-    link: "/",
-    label: "Home",
-  },
-  {
-    link: "/search",
-    label: "Search",
-  },
-  {
-    link: "/settings",
-    label: "Settings",
-  },
-];
-
-export function Navbar() {
-  const [opened, { toggle }] = useDisclosure(false);
-  const [active, setActive] = useState(links[0].link);
-  const { classes, cx } = useStyles();
-
-  const handleLinkClick = (link) => {
-    setActive(link);
-  };
-  const items = links.map((link) => (
-    <Link
-      key={link.label}
-      href={link.link}
-      className={cx(classes.link, {
-        [classes.linkActive]: active === link.link,
-      })}
-      onClick={() => handleLinkClick(link.link)}
-    >
-      {link.label}
-    </Link>
-  ));
+export default function Navbar({ children }: Props) {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <Header height={60}>
-      <Container className={classes.header}>
-        <Link href="/" className="flex">
-          <BookwormSvg />
-          <h1>Bookworm</h1>
-        </Link>
+    <div>
+      <TopMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
-        <Group spacing={5} className={classes.links}>
-          {items}
-        </Group>
-
-        <Burger
-          opened={opened}
-          onClick={toggle}
-          className={classes.burger}
-          size="sm"
-        />
-      </Container>
-    </Header>
+      <div className="flex">
+        <SideMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <div
+          className={"w-full " + (menuOpen && "sm:h-auto h-0 overflow-clip")}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
+
+const TopMenu = ({ menuOpen, setMenuOpen }) => {
+  return (
+    <div className="p-2 bg-neutral-950 z-50">
+      <div className="flex items-center text-lg">
+        <OpenMenuButton
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
+          className="sm:invisible"
+        />
+        <Logo className="-my-10 mx-3" />
+        {/* <TextInput
+          className="collapse sm:visible ms-auto me-2"
+          size="xs"
+          placeholder="Search"
+        />
+        <BiUser
+          size={24}
+          className="rounded-full align-right me-2 z-50 sm:z-auto"
+        /> */}
+      </div>
+    </div>
+  );
+};
+
+const SideMenu = ({ menuOpen, setMenuOpen }) => {
+  const buttons = [
+    { text: "Home", icon: <BiHomeAlt2 size={24} />, link: "/" },
+    { text: "Search", icon: <BiSearchAlt2 size={24} />, link: "/search" },
+    // { text: "Settings", icon: <BiCog size={24} />, link: "/settings" },
+  ];
+
+  return (
+    <div
+      className={
+        (!menuOpen && "collapse") +
+        " sm:visible fixed top-0 bg-neutral-950 z-40 p-2 space-y-3 h-screen w-full sm:w-fit"
+      }
+    >
+      <div className="flex items-center">
+        <OpenMenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        {menuOpen && <Logo className="-my-10 mx-3" />}
+      </div>
+
+      {buttons.map((btn) => {
+        return (
+          <MenuButton
+            key={btn.text}
+            text={btn.text}
+            icon={btn.icon}
+            link={btn.link}
+            showText={menuOpen}
+            setMenuOpen={setMenuOpen}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
+  return (
+    <div
+      className={
+        "p-1 hover:bg-neutral-800 rounded-md w-fit h-fit transition ease-in-out duration-300 " +
+        className
+      }
+    >
+      {(menuOpen && (
+        <BiSolidGridAlt size={24} onClick={() => setMenuOpen(false)} />
+      )) || <BiGridAlt size={24} onClick={() => setMenuOpen(true)} />}
+    </div>
+  );
+};
+
+const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
+  return (
+    <Link
+      href={link}
+      onClick={() => {
+        setMenuOpen(false);
+      }}
+      className="flex items-center hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300"
+    >
+      {icon}
+      {showText && (
+        <span className="mx-1 -my-1 font-semibold text-lg align-middle">
+          {text}
+        </span>
+      )}
+    </Link>
+  );
+};
+
+const Logo = ({ className = "" }) => {
+  return (
+    <Link href="/" className={"flex items-center text-lg " + className}>
+      <BookwormSvg />
+      Bookworm
+    </Link>
+  );
+};
 
 const BookwormSvg = () => {
   return (
     <svg
-      className="mt-2 me-3"
+      className="me-2 my-1"
       xmlns="http://www.w3.org/2000/svg"
       width="24"
       height="33"
