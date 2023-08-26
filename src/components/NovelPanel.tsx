@@ -9,12 +9,11 @@ import {
 } from "@mantine/core";
 import { ReactNode, useEffect, useState } from "react";
 import {
-  TiArrowBack,
-  TiBook,
-  TiStarFullOutline,
-  TiStarHalfOutline,
-  TiStarOutline,
-} from "react-icons/ti";
+  BiSolidBook,
+  BiSolidStar,
+  BiSolidStarHalf,
+  BiStar,
+} from "react-icons/bi";
 import { Novel } from "../types/Novel";
 
 interface Props {
@@ -26,22 +25,21 @@ const NovelPanel = ({ novel }: Props) => {
 
   useEffect(() => {
     const storage = localStorage.getItem(`lastReadChapter_${novel.id}`);
-    console.log(storage);
     if (storage) setLastRead(storage);
   }, [novel]);
 
   return (
-    <>
-      <TiArrowBack
-        className="cursor-pointer hover:text-sky-600"
-        size={24}
-        onClick={() => {
-          location.href = "/novel-list";
-        }}
-      />
-      <Group className="bg-stone-950 rounded-md p-4">
+    <div className="sm:flex bg-stone-950 sm:rounded-md p-4">
+      <div className="relative w-fit h-fit my-2 mx-auto sm:mx-2 rounded-md border border-neutral-800">
         <Image
-          className="m-2 rounded-md border border-neutral-800"
+          className="absolute blur-xl opacity-70"
+          alt="Book Cover"
+          src={novel.cover}
+          height={300}
+          width={225}
+        />
+        <Image
+          className="z-10"
           alt="Book Cover"
           src={novel.cover}
           height={300}
@@ -49,58 +47,51 @@ const NovelPanel = ({ novel }: Props) => {
           radius="md"
           withPlaceholder
         />
-        <div className="m-2">
-          <Title size="38px">{novel.title}</Title>
-          <div>
-            <span>
-              By{" "}
-              <Text
-                td="underline"
-                className="text-sky-600"
-                component="a"
-                href="/"
-              >
-                {novel.author}
-              </Text>
-            </span>
-          </div>
-
-          <Group my="1rem" spacing="md">
-            <NovelStat title="Chapters">
-              <TiBook className="me-2" /> {novel.chapter_count}
-            </NovelStat>
-            {/* <BookStat title="Views">
-                        <BsEye className="me-2" /> {viewsToString(book.views)}
-                    </BookStat> */}
-            <NovelStat title="Rating">
-              <RatingStars rating={novel.rating} /> {novel.rating}
-            </NovelStat>
-            <NovelStat title="Status">{novel.status}</NovelStat>
-          </Group>
-
-          <Group my="1rem" spacing={1}>
-            {novel.genres.map((item) => (
-              <GenreTag key={item} genre={item} />
-            ))}
-          </Group>
-
-          <Button
-            className="me-2 bg-sky-600"
-            onClick={() => {
-              location.href += "/" + lastRead;
-            }}
-          >
-            Read
-          </Button>
-          {/* <Button
-                    className="border-neutral-400 text-neutral-400 hover:bg-neutral-400/25"
-                    variant="outline"
-                >
-                    Chapter List
-                </Button> */}
+      </div>
+      <div className="m-2">
+        <Title size="38px" className="text-center sm:text-left">
+          {novel.title}
+        </Title>
+        <div>
+          <span>
+            By{" "}
+            <Text
+              td="underline"
+              className="text-sky-600"
+              component="a"
+              href="/"
+            >
+              {novel.author}
+            </Text>
+          </span>
         </div>
-      </Group>
-    </>
+
+        <Group my="1rem" spacing="md">
+          <NovelStat title="Chapters">
+            <BiSolidBook className="me-2" /> {novel.chapter_count}
+          </NovelStat>
+          <NovelStat title="Rating">
+            <RatingStars rating={novel.rating} /> {novel.rating}
+          </NovelStat>
+          <NovelStat title="Status">{novel.status}</NovelStat>
+        </Group>
+
+        <Group my="1rem" spacing={1}>
+          {novel.genres.map((item) => (
+            <GenreTag key={item} genre={item} />
+          ))}
+        </Group>
+
+        <Button
+          className="me-2 bg-sky-600"
+          onClick={() => {
+            location.href += "/" + lastRead;
+          }}
+        >
+          Read
+        </Button>
+      </div>
+    </div>
   );
 };
 
@@ -169,11 +160,11 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
   return (
     <div className="flex me-2">
       {filledStars.map((_item, index) => {
-        return <TiStarFullOutline key={"filledStar" + index} />;
+        return <BiSolidStar key={"filledStar" + index} />;
       })}
-      {Math.round(rating) > Math.floor(rating) && <TiStarHalfOutline />}
+      {Math.round(rating) > Math.floor(rating) && <BiSolidStarHalf />}
       {emptyStars.map((_item, index) => {
-        return <TiStarOutline key={"emptyStar" + index} />;
+        return <BiStar key={"emptyStar" + index} />;
       })}
     </div>
   );

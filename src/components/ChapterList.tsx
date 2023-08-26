@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Chapter } from "../types/Novel";
 
 interface Props {
@@ -6,11 +7,7 @@ interface Props {
 
 const ChapterList = ({ chapters }: Props) => {
   return (
-    <div id="chapter-list" className="p-4 mb-2 rounded-md bg-stone-950">
-      {/* <Title align="center" size="24px">
-                Chapter List
-            </Title>
-            <Divider className="my-4" size="md" /> */}
+    <div id="chapter-list" className="p-4 mb-2 sm:rounded-md bg-stone-950">
       {chapters.map((chapter, index) => (
         <ChapterRow key={index} index={index + 1} chapter={chapter} />
       ))}
@@ -27,17 +24,17 @@ interface ChapterRowProps {
 
 const ChapterRow = ({ index, chapter }: ChapterRowProps) => {
   return (
-    <div key={chapter.title} className="flex">
-      <span className="font-bold w-16 text-neutral-400/50">{index}</span>
-      <a
-        className="grow underline text-neutral-400 hover:text-neutral-200"
-        href={location.href + "/" + chapter.id}
-      >
+    <Link
+      href={location.href + "/" + chapter.id}
+      className={
+        "group outline outline-0 hover:outline-1 outline-neutral-700 p-1 m-1 rounded-md flex " +
+        (index % 2 == 0 && "bg-neutral-900")
+      }
+    >
+      <span className="grow text-neutral-400 group-hover:text-neutral-200 truncate">
         {chapter.title}
-      </a>
-      {/* <span className="text-right text-neutral-400/50">
-                {new RelativeTime().from(new Date(chapter.timestamp))}
-            </span> */}
-    </div>
+      </span>
+      <span className="font-bold ms-2 text-neutral-400/50">{index}</span>
+    </Link>
   );
 };

@@ -1,13 +1,11 @@
-import { Stack } from "@mantine/core";
 import RelativeTime from "@yaireo/relative-time";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { TiDocument } from "react-icons/ti";
+import { BiSolidFile } from "react-icons/bi";
+import { useQuery } from "react-query";
 import ChapterList from "../../components/ChapterList";
 import LoadingScreen from "../../components/LoadingScreen";
 import NovelPanel from "../../components/NovelPanel";
-import { Chapter, Novel } from "../../types/Novel";
-import { useQuery } from "react-query";
+import { Chapter } from "../../types/Novel";
 
 export default function NovelPage() {
   const router = useRouter();
@@ -28,13 +26,14 @@ export default function NovelPage() {
   });
 
   if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
+  localStorage.setItem(novel.id, JSON.stringify(novel));
 
   return (
-    <Stack className="w-4/5 mx-auto my-5" spacing="xs">
+    <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
       <NovelPanel novel={novel} />
       <LatestChapter chapter={novel.chapters[novel.chapters.length - 1]} />
       <ChapterList chapters={novel.chapters} />
-    </Stack>
+    </div>
   );
 }
 
@@ -44,14 +43,14 @@ interface LatestChapterProps {
 
 const LatestChapter = ({ chapter }: LatestChapterProps) => {
   return (
-    <div className="p-4 flex justify-between bg-stone-950 rounded-md">
-      <span className="flex flex-none items-center">
-        <TiDocument className="me-2" />
+    <div className="p-4 flex flex-wrap sm:flex-nowrap justify-between sm:space-x-2 bg-stone-950 sm:rounded-md">
+      <span className="flex flex-none items-center me-2 sm:me-0">
+        <BiSolidFile className="me-2" />
         Lastest Chapter
       </span>
-      <span>
+      <span className="truncate sm:text-center grow">
         <a
-          className="underline text-neutral-400 hover:text-neutral-200"
+          className="text-neutral-400 hover:text-neutral-200"
           href={chapter.id}
         >
           {chapter.title}
