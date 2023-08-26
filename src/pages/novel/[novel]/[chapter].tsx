@@ -158,7 +158,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
         href={`/novel/${novel.id}/${nextChapter}`}
         className={
           "hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 " +
-          (currentChapterIndex - 1 < 0 && "invisible")
+          (currentChapterIndex + 1 >= novel.chapters.length && "invisible")
         }
       >
         <BiRightArrowAlt title="Next Chapter" size={24} />
