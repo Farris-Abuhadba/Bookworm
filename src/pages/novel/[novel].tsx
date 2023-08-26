@@ -1,4 +1,5 @@
 import RelativeTime from "@yaireo/relative-time";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { BiSolidFile } from "react-icons/bi";
 import { useQuery } from "react-query";
@@ -48,14 +49,11 @@ const LatestChapter = ({ chapter }: LatestChapterProps) => {
         <BiSolidFile className="me-2" />
         Lastest Chapter
       </span>
-      <span className="truncate sm:text-center grow">
-        <a
-          className="text-neutral-400 hover:text-neutral-200"
-          href={chapter.id}
-        >
+      <Link href={location.href + "/" + chapter.id}>
+        <span className="truncate sm:text-center grow text-neutral-400 hover:text-neutral-200">
           {chapter.title}
-        </a>
-      </span>
+        </span>
+      </Link>
       <span className="text-neutral-400/50">
         {new RelativeTime().from(new Date(chapter.timestamp))}
       </span>
