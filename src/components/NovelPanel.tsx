@@ -24,8 +24,12 @@ const NovelPanel = ({ novel }: Props) => {
   const [lastRead, setLastRead] = useState(novel.chapters[0].id);
 
   useEffect(() => {
-    const storage = localStorage.getItem(`lastReadChapter_${novel.id}`);
-    if (storage) setLastRead(storage);
+    var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
+    if (lastReadChapters == undefined) lastReadChapters = {};
+    var lastReadChapter = lastReadChapters[novel.id];
+
+    if (lastReadChapter == undefined) return;
+    else setLastRead(lastReadChapter);
   }, [novel]);
 
   return (

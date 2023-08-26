@@ -27,7 +27,7 @@ export default function NovelPage() {
   });
 
   if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
-  localStorage.setItem(novel.id, JSON.stringify(novel));
+  sessionStorage.setItem(novel.id, JSON.stringify(novel));
 
   return (
     <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">

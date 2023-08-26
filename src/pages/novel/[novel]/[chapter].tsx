@@ -9,6 +9,7 @@ import {
   BiRightArrowAlt,
 } from "react-icons/bi";
 import { useQuery } from "react-query";
+import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
 
@@ -37,10 +38,16 @@ export default function ChapterContent() {
   if (!router.isReady || isLoading)
     return <LoadingScreen backUrl={"/novel/" + novel} />;
 
-  localStorage.setItem(`lastReadChapter_${novel}`, currentChapter);
+  var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
+  if (lastReadChapters == undefined) lastReadChapters = {};
+  lastReadChapters[novel.toString()] = currentChapter;
+  localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
 
-  const novelData = JSON.parse(localStorage.getItem(novel.toString()));
+  const novelData = JSON.parse(sessionStorage.getItem(novel.toString()));
   if (!novelData) location.href = "/novel/" + novel;
+
+  if (chapterData.error != undefined)
+    return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
 
   return (
     <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
@@ -168,11 +175,8 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 };
 
 const ChapterSettings = ({ setFontSize, setPadding }) => {
-  var savedFontSize = parseInt(localStorage.getItem("settings_fontSize"));
-  if (Number.isNaN(savedFontSize)) savedFontSize = 2;
-
-  var savedPadding = parseInt(localStorage.getItem("settings_padding"));
-  if (Number.isNaN(savedPadding)) savedPadding = 4;
+  var savedFontSize = getSetting("fontSize", true, 2);
+  var savedPadding = getSetting("padding", true, 4);
 
   return (
     <Stack className="items-end" spacing="xl">
@@ -186,7 +190,7 @@ const ChapterSettings = ({ setFontSize, setPadding }) => {
           label={null}
           marks={fontSizes}
           onChange={(value) => {
-            localStorage.setItem("settings_fontSize", value.toString());
+            setSetting("fontSize", value);
             setFontSize(fontSizes[value].tailwind);
           }}
         />
@@ -201,7 +205,7 @@ const ChapterSettings = ({ setFontSize, setPadding }) => {
           max={12}
           placeholder="Default: 4"
           onChange={(value) => {
-            localStorage.setItem("settings_padding", value.toString());
+            setSetting("padding", value);
             setPadding(`my-${value}`);
           }}
         />
@@ -210,15 +214,28 @@ const ChapterSettings = ({ setFontSize, setPadding }) => {
   );
 };
 
-const getSetting = (key: string, ready: boolean, defaultValue) => {
+const getSetting = (key: string, ready: boolean, defaultValue: any) => {
   let storedValue;
 
-  if (ready) storedValue = parseInt(localStorage.getItem("settings_" + key));
+  if (ready) {
+    var settings = JSON.parse(localStorage.getItem("settings"));
+    if (settings == undefined) return defaultValue;
+
+    storedValue = settings[key];
+  }
 
   if (storedValue == undefined || Number.isNaN(storedValue))
-    storedValue = defaultValue;
+    return defaultValue;
 
   return storedValue;
+};
+
+const setSetting = (key: string, value: any) => {
+  var settings = JSON.parse(localStorage.getItem("settings"));
+  if (settings == undefined) settings = {};
+
+  settings[key] = value;
+  localStorage.setItem("settings", JSON.stringify(settings));
 };
 
 const fontSizes = [
