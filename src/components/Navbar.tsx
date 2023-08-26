@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ReactNode, useState } from "react";
 import {
+  BiCookie,
   BiGridAlt,
   BiHomeAlt2,
   BiSearchAlt2,
@@ -85,6 +86,23 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
           />
         );
       })}
+
+      <div
+        className="flex items-center hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 text-red-400"
+        onClick={() => {
+          localStorage.clear();
+          sessionStorage.clear();
+          setMenuOpen(false);
+        }}
+        title="Clear Storage"
+      >
+        <BiCookie size={24} />
+        {menuOpen && (
+          <span className="mx-1 -my-1 font-semibold text-lg align-middle">
+            Clear Storage
+          </span>
+        )}
+      </div>
     </div>
   );
 };
@@ -111,6 +129,7 @@ const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
       onClick={() => {
         setMenuOpen(false);
       }}
+      title={text}
       className="flex items-center hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300"
     >
       {icon}
