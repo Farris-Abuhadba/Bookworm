@@ -1,7 +1,13 @@
 import { Image, NumberInput, Popover, Slider, Stack } from "@mantine/core";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { TiArrowLeft, TiArrowRight, TiCog, TiThMenu } from "react-icons/ti";
+import {
+  BiCog,
+  BiLeftArrowAlt,
+  BiListUl,
+  BiRightArrowAlt,
+} from "react-icons/bi";
 import { useQuery } from "react-query";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
@@ -37,7 +43,7 @@ export default function ChapterContent() {
   if (!novelData) location.href = "/novel/" + novel;
 
   return (
-    <Stack className="w-4/5 mx-auto my-5" spacing="xs">
+    <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
       <ChapterHeader
         novel={novelData}
         chapter={chapterData}
@@ -45,7 +51,7 @@ export default function ChapterContent() {
         setPadding={setPadding}
       />
 
-      <div className="bg-neutral-950 rounded-md p-4 px-7">
+      <div className="bg-neutral-950 sm:rounded-md p-4 px-7">
         {chapterData.content.map((text, index) => {
           return (
             <p key={index} className={`${padding} ${fontSize}`}>
@@ -56,7 +62,7 @@ export default function ChapterContent() {
       </div>
 
       <ChapterControls novel={novelData} chapter={chapterData} />
-    </Stack>
+    </div>
   );
 }
 
@@ -74,10 +80,10 @@ const ChapterHeader = ({
   setPadding,
 }: ChapterHeaderProps) => {
   return (
-    <div className="bg-neutral-950 rounded-md p-4 px-7 flex justify-between items-center">
+    <div className="bg-neutral-950 sm:rounded-md sm:p-4 sm:px-7 flex justify-between items-center">
       <div className="flex">
         <Image
-          className="my-2 rounded-md border border-neutral-800"
+          className="hidden sm:block my-2 rounded-md border border-neutral-800"
           alt={novel.title}
           src={novel.cover}
           height={100}
@@ -87,7 +93,7 @@ const ChapterHeader = ({
         />
         <div className="m-5">
           <a
-            className="text-4xl font-bold hover:text-sky-600 hover:underline"
+            className="text-2xl sm:text-4xl font-bold hover:text-sky-600 hover:underline"
             href={"/novel/" + novel.id}
           >
             {novel.title}
@@ -96,10 +102,10 @@ const ChapterHeader = ({
         </div>
       </div>
 
-      <Popover position="bottom">
+      <Popover>
         <Popover.Target>
-          <div>
-            <TiCog title="Settings" size={25} className="hover:text-sky-600" />
+          <div className="hidden sm:block hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300">
+            <BiCog title="Settings" size={25} />
           </div>
         </Popover.Target>
         <Popover.Dropdown>
@@ -123,42 +129,40 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
     }
   });
 
+  const prevChapter =
+    currentChapterIndex - 1 >= 0 && novel.chapters[currentChapterIndex - 1].id;
+  const nextChapter =
+    currentChapterIndex + 1 < novel.chapters.length &&
+    novel.chapters[currentChapterIndex + 1].id;
+
   return (
-    <div className="bg-neutral-950 rounded-md p-4 px-7 flex justify-between items-center">
-      <TiArrowLeft
-        title="Previous Chapter"
-        size={30}
-        className={`hover:text-sky-600 ${
-          currentChapterIndex - 1 < 0 ? "invisible" : ""
-        }`}
-        onClick={() => {
-          location.href = `/novel/${novel.id}/${
-            novel.chapters[currentChapterIndex - 1].id
-          }`;
-        }}
-      />
+    <div className="bg-neutral-950 sm:rounded-md p-4 px-7 flex justify-between items-center">
+      <Link
+        href={`/novel/${novel.id}/${prevChapter}`}
+        className={
+          "hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 " +
+          (currentChapterIndex - 1 < 0 && "invisible")
+        }
+      >
+        <BiLeftArrowAlt title="Previous Chapter" size={24} />
+      </Link>
 
-      <TiThMenu
-        title="Chapter List"
-        size={20}
-        className="hover:text-sky-600"
-        onClick={() => {
-          location.href = `/novel/${novel.id}`;
-        }}
-      />
+      <Link
+        href={`/novel/${novel.id}`}
+        className="hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300"
+      >
+        <BiListUl title="Chapter List" size={24} />
+      </Link>
 
-      <TiArrowRight
-        title="Next Chapter"
-        size={30}
-        className={`hover:text-sky-600 ${
-          novel.chapters.length <= currentChapterIndex + 1 ? "invisible" : ""
-        }`}
-        onClick={() => {
-          location.href = `/novel/${novel.id}/${
-            novel.chapters[currentChapterIndex + 1].id
-          }`;
-        }}
-      />
+      <Link
+        href={`/novel/${novel.id}/${nextChapter}`}
+        className={
+          "hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 " +
+          (currentChapterIndex - 1 < 0 && "invisible")
+        }
+      >
+        <BiRightArrowAlt title="Next Chapter" size={24} />
+      </Link>
     </div>
   );
 };
