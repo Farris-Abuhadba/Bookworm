@@ -27,11 +27,11 @@ const ChapterRow = ({ index, chapter }: ChapterRowProps) => {
     <Link
       href={location.href + "/" + chapter.id}
       className={
-        "group outline outline-0 hover:outline-1 outline-neutral-700 p-1 m-1 rounded-md flex " +
+        "group outline outline-0 hover:outline-1 outline-neutral-700 p-1 m-1 rounded-md flex fade " +
         (index % 2 == 0 && "bg-neutral-900")
       }
     >
-      <span className="grow text-neutral-400 group-hover:text-neutral-200 truncate">
+      <span className="grow text-neutral-400 group-hover:text-neutral-200 truncate fade">
         {chapter.title}
       </span>
       <span className="font-bold ms-2 text-neutral-400/50">{index}</span>

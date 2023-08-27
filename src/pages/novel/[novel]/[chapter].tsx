@@ -111,7 +111,7 @@ const ChapterHeader = ({
 
       <Popover>
         <Popover.Target>
-          <div className="hidden sm:block hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300">
+          <div className="hidden sm:block hover:bg-neutral-800 p-1 rounded-md fade">
             <BiCog title="Settings" size={25} />
           </div>
         </Popover.Target>
@@ -147,7 +147,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
       <Link
         href={`/novel/${novel.id}/${prevChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 " +
+          "hover:bg-neutral-800 p-1 rounded-md fade " +
           (currentChapterIndex - 1 < 0 && "invisible")
         }
       >
@@ -156,7 +156,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 
       <Link
         href={`/novel/${novel.id}`}
-        className="hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300"
+        className="hover:bg-neutral-800 p-1 rounded-md fade"
       >
         <BiListUl title="Chapter List" size={24} />
       </Link>
@@ -164,7 +164,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
       <Link
         href={`/novel/${novel.id}/${nextChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 " +
+          "hover:bg-neutral-800 p-1 rounded-md fade " +
           (currentChapterIndex + 1 >= novel.chapters.length && "invisible")
         }
       >

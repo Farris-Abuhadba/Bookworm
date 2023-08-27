@@ -50,7 +50,7 @@ const LatestChapter = ({ chapter }: LatestChapterProps) => {
         Lastest Chapter
       </span>
       <Link href={location.href + "/" + chapter.id}>
-        <span className="truncate sm:text-center grow text-neutral-400 hover:text-neutral-200">
+        <span className="truncate sm:text-center grow text-neutral-400 hover:text-neutral-200 fade">
           {chapter.title}
         </span>
       </Link>
