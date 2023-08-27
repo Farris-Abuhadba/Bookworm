@@ -1,5 +1,6 @@
+import { Divider, Image } from "@mantine/core";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   BiCookie,
   BiGridAlt,
@@ -7,6 +8,7 @@ import {
   BiSearchAlt2,
   BiSolidGridAlt,
 } from "react-icons/bi";
+import { Novel } from "../types/Novel";
 
 interface Props {
   children: ReactNode;
@@ -62,11 +64,26 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
     // { text: "Settings", icon: <BiCog size={24} />, link: "/settings" },
   ];
 
+  const [recentNovels, setRecentNovels] = useState<Novel[]>([]);
+
+  useEffect(() => {
+    let novels = [];
+    for (let i = 0; i < 3; i++) {
+      let key = sessionStorage.key(i);
+      if (key == undefined) break;
+
+      novels.push(JSON.parse(sessionStorage.getItem(key)));
+    }
+
+    console.log(novels);
+    setRecentNovels(novels);
+  }, [setRecentNovels]);
+
   return (
     <div
       className={
-        (!menuOpen && "collapse") +
-        " sm:visible fixed top-0 bg-neutral-950 z-40 p-2 space-y-3 h-screen w-full sm:w-fit"
+        ((!menuOpen && "collapse") || "overflow-y-auto") +
+        " sm:visible fixed top-0 bg-neutral-950 z-40 p-2 space-y-3 h-screen w-full sm:w-fit sm:max-w-[300px]"
       }
     >
       <div className="flex items-center">
@@ -88,7 +105,7 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
       })}
 
       <div
-        className="flex items-center hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300 text-red-400"
+        className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade text-red-400"
         onClick={() => {
           localStorage.clear();
           sessionStorage.clear();
@@ -103,6 +120,24 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
           </span>
         )}
       </div>
+
+      {menuOpen && recentNovels.length > 0 && (
+        <>
+          <Divider />
+
+          {recentNovels.map((novel) => {
+            return (
+              <NovelButton
+                key={novel.id}
+                id={novel.id}
+                title={novel.title}
+                image={novel.cover}
+                setMenuOpen={setMenuOpen}
+              />
+            );
+          })}
+        </>
+      )}
     </div>
   );
 };
@@ -111,8 +146,7 @@ const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
   return (
     <div
       className={
-        "p-1 hover:bg-neutral-800 rounded-md w-fit h-fit transition ease-in-out duration-300 " +
-        className
+        "p-1 hover:bg-neutral-800 rounded-md w-fit h-fit fade " + className
       }
     >
       {(menuOpen && (
@@ -130,7 +164,7 @@ const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
         setMenuOpen(false);
       }}
       title={text}
-      className="flex items-center hover:bg-neutral-800 p-1 rounded-md transition ease-in-out duration-300"
+      className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade"
     >
       {icon}
       {showText && (
@@ -138,6 +172,30 @@ const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
           {text}
         </span>
       )}
+    </Link>
+  );
+};
+
+const NovelButton = ({ image, title, id, setMenuOpen }) => {
+  return (
+    <Link
+      href={"/novel/" + id}
+      onClick={() => {
+        setMenuOpen(false);
+      }}
+      title={title}
+      className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade space-x-2"
+    >
+      <Image
+        className="border border-neutral-800 rounded-md"
+        radius={6}
+        width={34}
+        height={49}
+        src={image}
+      />
+      <span className="line-clamp-2 h-full shrink max-w-[70%] sm:max-w-[150px]">
+        {title}
+      </span>
     </Link>
   );
 };
