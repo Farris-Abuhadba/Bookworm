@@ -19,10 +19,19 @@ const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
 
     var title = document.querySelector("a.chr-title").textContent;
 
+    var watermark: String = document.querySelector(
+      ".comments > script:nth-child(2)"
+    ).textContent;
+    watermark = watermark.substring(
+      watermark.indexOf('replace("') + 9,
+      watermark.indexOf('", "")')
+    );
+
     var content = [];
     var ps = document.querySelectorAll("#chr-content p");
     ps.forEach((p) => {
-      if (p && p.textContent != "") content.push(p.textContent);
+      if (p && p.textContent != "")
+        content.push(p.textContent.replace(watermark, ""));
     });
 
     const chapter: Chapter = {
