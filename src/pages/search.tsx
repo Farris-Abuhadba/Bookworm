@@ -38,7 +38,7 @@ const Search = () => {
   };
 
   return (
-    <div className="max-w-2/5 w-3/5 m-5 mx-auto p-4 rounded-md bg-neutral-950 space-y-5">
+    <div className="max-w-2/5 mx-auto p-4 rounded-md bg-neutral-950 space-y-5">
       <div className="flex space-x-4 items-center">
         <BiSearchAlt2 className="text-neutral-500" size={24} />
 
@@ -60,21 +60,22 @@ const Search = () => {
           Search
         </Button>
       </div>
-      <div>
+      <div className="flex ml-9 flex-col">
         {novels.map((novel, index) => {
           const novelName = novel.link.split("/").pop();
           return (
-            <div key={index}>
+            <div className="" key={index}>
               <Link href={`/novel/${novelName}`} className="flex items-center">
                 {showImages && (
                   <>
                     <Image
-                      className="m-2 w-fit rounded-md border border-neutral-800"
-                      width={200}
-                      height={89}
+                      className="m-2 min-w-[100px] max-w-[100px] border border-neutral-800"
+                      width={100}
+                      height={90}
                       src={novel.img}
                       radius="md"
                       withPlaceholder
+                      style={{ width: "100%", height: "100%" }}
                     />
                     <span className="text-xl">{novel.title}</span>
                   </>
