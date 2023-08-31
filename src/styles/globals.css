@@ -5,3 +5,23 @@
 .fade {
   @apply transition ease-in-out duration-300;
 }
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1b1e;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff38;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border: 1px solid #ffffff50;
+}
+
+::-webkit-scrollbar-thumb:active {
+  border-color: #ffffffa4;
+}
