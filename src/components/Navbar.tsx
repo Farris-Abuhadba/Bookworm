@@ -200,7 +200,7 @@ const NovelButton = ({ image, title, id, setMenuOpen }) => {
   );
 };
 
-const Logo = ({ className = "" }) => {
+export const Logo = ({ className = "" }) => {
   return (
     <Link href="/" className={"flex items-center text-lg " + className}>
       <BookwormSvg />
