@@ -94,6 +94,17 @@ const NovelPanel = ({ novel }: Props) => {
         >
           Read
         </Button>
+
+        <Button
+          variant="outline"
+          onClick={() => {
+            let lib = JSON.parse(localStorage.getItem("novelLibrary")) || [];
+            lib.push(novel.id);
+            localStorage.setItem("novelLibrary", JSON.stringify(lib));
+          }}
+        >
+          Add to Library
+        </Button>
       </div>
     </div>
   );
