@@ -12,46 +12,46 @@ import {
 import { IconType } from "react-icons/lib";
 import { Logo } from "./Navbar";
 
-// TODO: Phone support
-
 const OurFooter = () => {
   const message = "Welcome to Degenerate Heaven";
 
   const socials = [
-    { name: "Twitter", icon: BiLogoTwitter, link: "https://www.twitter.com" },
-    {
-      name: "Facebook",
-      icon: BiLogoFacebook,
-      link: "https://www.facebook.com",
-    },
-    { name: "Reddit", icon: BiLogoReddit, link: "https://www.reddit.com" },
-    {
-      name: "Instagram",
-      icon: BiLogoInstagram,
-      link: "https://www.instagram.com",
-    },
-    {
-      name: "Tiktok",
-      icon: BiLogoTiktok,
-      link: "https://www.tiktok.com",
-    },
-    {
-      name: "Discord",
-      icon: BiLogoDiscordAlt,
-      link: "https://www.discord.com",
-    },
+    // { name: "Twitter", icon: BiLogoTwitter, link: "https://www.twitter.com" },
+    // {
+    //   name: "Facebook",
+    //   icon: BiLogoFacebook,
+    //   link: "https://www.facebook.com",
+    // },
+    // { name: "Reddit", icon: BiLogoReddit, link: "https://www.reddit.com" },
+    // {
+    //   name: "Instagram",
+    //   icon: BiLogoInstagram,
+    //   link: "https://www.instagram.com",
+    // },
+    // {
+    //   name: "Tiktok",
+    //   icon: BiLogoTiktok,
+    //   link: "https://www.tiktok.com",
+    // },
+    // {
+    //   name: "Discord",
+    //   icon: BiLogoDiscordAlt,
+    //   link: "https://www.discord.com",
+    // },
     {
       name: "Email",
       icon: BiEnvelope,
-      link: "mailto:contact@bookworm.com",
+      link: "mailto:contact.bookworm.ln@gmail.com",
     },
   ];
 
   return (
     <Footer height={1}>
-      <div className="ms-[56px] me-2 my-2 flex relative items-center">
+      <div className="sm:ms-[56px] mx-2 my-2 flex relative items-center">
         <Logo className="absolute left-2" />
-        <span className="text-center w-full">{message}</span>
+        <span className="text-center w-full invisible sm:visible">
+          {message}
+        </span>
         <div className="flex space-x-1 absolute right-2">
           {socials.map((social, index) => {
             return (
