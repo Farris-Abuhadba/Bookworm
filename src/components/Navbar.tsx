@@ -104,23 +104,6 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
         );
       })}
 
-      <div
-        className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade text-red-400"
-        onClick={() => {
-          localStorage.clear();
-          sessionStorage.clear();
-          setMenuOpen(false);
-        }}
-        title="Clear Storage"
-      >
-        <BiCookie size={24} />
-        {menuOpen && (
-          <span className="mx-1 -my-1 font-semibold text-lg align-middle">
-            Clear Storage
-          </span>
-        )}
-      </div>
-
       {menuOpen && recentNovels.length > 0 && (
         <>
           <Divider />
