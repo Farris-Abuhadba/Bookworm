@@ -97,6 +97,7 @@ const NovelPanel = ({ novel }: Props) => {
 
         <Button
           variant="outline"
+          color="gray"
           onClick={() => {
             let lib = JSON.parse(localStorage.getItem("novelLibrary")) || [];
             lib.push(novel.id);
@@ -105,6 +106,7 @@ const NovelPanel = ({ novel }: Props) => {
         >
           Add to Library
         </Button>
+        {/* TODO: Change button if it is in the library */}
       </div>
     </div>
   );
