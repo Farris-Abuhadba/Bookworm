@@ -2,6 +2,7 @@ import { Button, Divider, Image, Menu, Progress, Title } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BiDotsVerticalRounded, BiTrashAlt } from "react-icons/bi";
+import { Chapter } from "../types/Novel";
 import { GetNovelData } from "./novel/[novel]";
 
 const LibraryPage = () => {
@@ -39,6 +40,20 @@ const NovelRow = ({ novelId, index }) => {
     );
   if (isLoading || !novel) return <NovelRowSkeletonLoader index={index} />;
 
+  let lastRead;
+  try {
+    lastRead = JSON.parse(localStorage.getItem("lastReadChapters"))[novelId];
+  } catch {
+    lastRead = "";
+  }
+
+  let progress = 0;
+  novel.chapters.forEach((chapter: Chapter, index: number) => {
+    if (chapter.id == lastRead) {
+      progress = index + 1;
+    }
+  });
+
   return (
     <>
       {index != 0 && <Divider size="sm" />}
@@ -63,7 +78,7 @@ const NovelRow = ({ novelId, index }) => {
         </Link>
         <div className="flex space-x-2 items-center">
           <NovelRowProgressBar
-            progress={Math.round(Math.random() * novel.chapters.length)}
+            progress={progress}
             maxProgress={novel.chapters.length}
           />
           <Button className="bg-sky-600">Read</Button>
