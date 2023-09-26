@@ -14,6 +14,7 @@ import {
   BiSolidStarHalf,
   BiStar,
 } from "react-icons/bi";
+import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
 import { Novel } from "../types/Novel";
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
 
 const NovelPanel = ({ novel }: Props) => {
   const [lastRead, setLastRead] = useState(novel.chapters[0].id);
+  const [inLibrary, setInLibrary] = useState(isInLibrary(novel.id));
 
   useEffect(() => {
     var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
@@ -94,6 +96,29 @@ const NovelPanel = ({ novel }: Props) => {
         >
           Read
         </Button>
+
+        {(inLibrary && (
+          <Button
+            variant="outline"
+            color="gray"
+            onClick={() => {
+              removeFromLibrary(novel.id);
+              setInLibrary(isInLibrary(novel.id));
+            }}
+          >
+            Remove from Library
+          </Button>
+        )) || (
+          <Button
+            className="border border-sky-600 text-sky-600 hover:bg-sky-600/10"
+            onClick={() => {
+              addToLibrary(novel.id);
+              setInLibrary(isInLibrary(novel.id));
+            }}
+          >
+            Add to Library
+          </Button>
+        )}
       </div>
     </div>
   );

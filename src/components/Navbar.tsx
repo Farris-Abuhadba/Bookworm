@@ -2,12 +2,12 @@ import { Divider, Image } from "@mantine/core";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import {
-  BiCookie,
   BiGridAlt,
   BiHomeAlt2,
   BiSearchAlt2,
   BiSolidGridAlt,
 } from "react-icons/bi";
+import { PiBooks } from "react-icons/pi";
 import { Novel } from "../types/Novel";
 
 interface Props {
@@ -61,6 +61,7 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
   const buttons = [
     { text: "Home", icon: <BiHomeAlt2 size={24} />, link: "/" },
     { text: "Search", icon: <BiSearchAlt2 size={24} />, link: "/search" },
+    { text: "Library", icon: <PiBooks size={24} />, link: "/library" },
     // { text: "Settings", icon: <BiCog size={24} />, link: "/settings" },
   ];
 

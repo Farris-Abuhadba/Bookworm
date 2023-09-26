@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { BiSolidFile } from "react-icons/bi";
 import { useQuery } from "react-query";
 import ChapterList from "../../components/ChapterList";
+import ErrorScreen from "../../components/ErrorScreen";
 import LoadingScreen from "../../components/LoadingScreen";
 import NovelPanel from "../../components/NovelPanel";
 import { Chapter } from "../../types/Novel";
@@ -11,22 +12,11 @@ import { Chapter } from "../../types/Novel";
 export default function NovelPage() {
   const router = useRouter();
   const novelName = router.query.novel?.toString();
-  const cleanedNovelName = novelName?.substring(
-    0,
-    novelName.lastIndexOf("-novel")
-  );
 
-  const { data: novel, isLoading } = useQuery({
-    queryKey: ["novel", cleanedNovelName],
-    queryFn: async () => {
-      const response = await fetch(`/api/novel?id=${cleanedNovelName}`);
-      const data = await response.json();
-      return data;
-    },
-    enabled: !!cleanedNovelName,
-  });
-
+  const { data: novel, isLoading } = GetNovelData(novelName);
   if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
+  if (novel.error)
+    return <ErrorScreen title="API Error">Novel not found</ErrorScreen>;
   sessionStorage.setItem(novel.id, JSON.stringify(novel));
 
   return (
@@ -37,6 +27,24 @@ export default function NovelPage() {
     </div>
   );
 }
+
+export const GetNovelData = (novelId: string) => {
+  let cleanedNovelId;
+  if (novelId != undefined) {
+    cleanedNovelId = novelId.substring(0, novelId.lastIndexOf("-novel"));
+  }
+
+  return useQuery({
+    queryKey: ["novel", cleanedNovelId],
+    queryFn: async () => {
+      const response = await fetch(`/api/novel?id=${cleanedNovelId}`);
+      const data = await response.json();
+      return data;
+    },
+    enabled: !!novelId,
+    refetchOnWindowFocus: false,
+  });
+};
 
 interface LatestChapterProps {
   chapter: Chapter;
