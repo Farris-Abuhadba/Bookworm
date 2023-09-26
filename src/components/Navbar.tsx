@@ -59,10 +59,9 @@ const TopMenu = ({ menuOpen, setMenuOpen }) => {
 
 const SideMenu = ({ menuOpen, setMenuOpen }) => {
   const buttons = [
-    { text: "Home", icon: <BiHomeAlt2 size={24} />, link: "/" },
-    { text: "Search", icon: <BiSearchAlt2 size={24} />, link: "/search" },
-    { text: "Library", icon: <PiBooks size={24} />, link: "/library" },
-    // { text: "Settings", icon: <BiCog size={24} />, link: "/settings" },
+    { text: "Home", icon: BiHomeAlt2, link: "/" },
+    { text: "Search", icon: BiSearchAlt2, link: "/search" },
+    { text: "Library", icon: PiBooks, link: "/library" },
   ];
 
   const [recentNovels, setRecentNovels] = useState<Novel[]>([]);
@@ -97,7 +96,7 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
           <MenuButton
             key={btn.text}
             text={btn.text}
-            icon={btn.icon}
+            Icon={btn.icon}
             link={btn.link}
             showText={menuOpen}
             setMenuOpen={setMenuOpen}
@@ -140,7 +139,7 @@ const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
   );
 };
 
-const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
+const MenuButton = ({ text, Icon, link, showText, setMenuOpen }) => {
   return (
     <Link
       href={link}
@@ -150,7 +149,7 @@ const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
       title={text}
       className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade"
     >
-      {icon}
+      <Icon size={24} />
       {showText && (
         <span className="mx-1 -my-1 font-semibold text-lg align-middle">
           {text}
