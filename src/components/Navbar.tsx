@@ -24,7 +24,9 @@ export default function Navbar({ children }: Props) {
         <OpenMenuButton
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
-          className="z-50 m-2 absolute sm:fixed top-0"
+          className={
+            "z-50 m-2 absolute top-0" + (menuOpen || pinned ? " sm:fixed" : "")
+          }
         />
         <TopMenu className="ms-12" menuOpen={menuOpen} />
       </div>
@@ -58,7 +60,7 @@ const TopMenu = ({ menuOpen, className }) => {
   );
 };
 
-// TODO: Hide SideMenu when unpinned, save pinned in settings, update recent novel list w/o refresh, fix recent novel list title truncate
+// TODO: update recent novel list w/o refresh, fix recent novel list title truncate
 const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   const buttons = [
     { text: "Home", icon: BiHomeAlt2, link: "/" },
@@ -77,6 +79,11 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
       novels.push(JSON.parse(sessionStorage.getItem(key)));
     }
 
+    let settings = JSON.parse(localStorage.getItem("settings")) || {};
+    if (settings.pinMenu != undefined && settings.pinMenu != pinned) {
+      setPinned(settings.pinMenu);
+    }
+
     console.log(novels);
     setRecentNovels(novels);
   }, [setRecentNovels]);
@@ -84,8 +91,9 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   return (
     <div
       className={
-        ((!menuOpen && "collapse") || "overflow-y-auto min-w-[200px]") +
-        " sm:visible fixed top-0 bg-neutral-950 z-30 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between"
+        "sm:visible fixed top-0 z-30 bg-neutral-950 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
+        (!menuOpen ? " collapse" : " overflow-y-auto min-w-[200px]") +
+        (!pinned && !menuOpen ? " sm:collapse" : "")
       }
     >
       <div className="space-y-2 pt-10">
@@ -122,6 +130,10 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
 
       <div
         onClick={() => {
+          let settings = JSON.parse(localStorage.getItem("settings")) || {};
+          settings.pinMenu = !pinned;
+          localStorage.setItem("settings", JSON.stringify(settings));
+
           setPinned(!pinned);
         }}
         title={(pinned ? "Unpin" : "Pin") + " Sidebar"}
