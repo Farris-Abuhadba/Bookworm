@@ -7,7 +7,7 @@ import {
   BiSearchAlt2,
   BiSolidGridAlt,
 } from "react-icons/bi";
-import { PiBooks } from "react-icons/pi";
+import { PiBooks, PiPushPin, PiPushPinFill } from "react-icons/pi";
 import { Novel } from "../types/Novel";
 
 interface Props {
@@ -16,53 +16,56 @@ interface Props {
 
 export default function Navbar({ children }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pinned, setPinned] = useState<boolean>(false);
 
   return (
-    <div>
-      <TopMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+    <>
+      <div className="flex bg-neutral-950">
+        <OpenMenuButton
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
+          className={
+            "z-50 m-2 absolute top-0" + (menuOpen || pinned ? " sm:fixed" : "")
+          }
+        />
+        <TopMenu className="ms-12" menuOpen={menuOpen} />
+      </div>
 
       <div className="flex">
-        <SideMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+        <SideMenu
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
+          pinned={pinned}
+          setPinned={setPinned}
+        />
         <div
-          className={"w-full " + (menuOpen && "sm:h-auto h-0 overflow-clip")}
+          className={
+            "w-full " +
+            (menuOpen ? "sm:h-auto h-0 overflow-clip " : "") +
+            (pinned ? "sm:ms-12 " : "")
+          }
         >
           {children}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-const TopMenu = ({ menuOpen, setMenuOpen }) => {
+const TopMenu = ({ menuOpen, className }) => {
   return (
-    <div className="p-2 bg-neutral-950 z-50">
-      <div className="flex items-center text-lg">
-        <OpenMenuButton
-          menuOpen={menuOpen}
-          setMenuOpen={setMenuOpen}
-          className="sm:invisible"
-        />
-        <Logo className="-my-10 mx-3" />
-        {/* <TextInput
-          className="collapse sm:visible ms-auto me-2"
-          size="xs"
-          placeholder="Search"
-        />
-        <BiUser
-          size={24}
-          className="rounded-full align-right me-2 z-50 sm:z-auto"
-        /> */}
-      </div>
+    <div className={"p-2 h-12 flex items-center text-lg " + className}>
+      <Logo className={"-my-10 z-40" + (menuOpen ? " fixed" : "")} />
     </div>
   );
 };
 
-const SideMenu = ({ menuOpen, setMenuOpen }) => {
+// TODO: update recent novel list w/o refresh, fix recent novel list title truncate
+const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   const buttons = [
-    { text: "Home", icon: <BiHomeAlt2 size={24} />, link: "/" },
-    { text: "Search", icon: <BiSearchAlt2 size={24} />, link: "/search" },
-    { text: "Library", icon: <PiBooks size={24} />, link: "/library" },
-    // { text: "Settings", icon: <BiCog size={24} />, link: "/settings" },
+    { text: "Home", icon: BiHomeAlt2, link: "/" },
+    { text: "Search", icon: BiSearchAlt2, link: "/search" },
+    { text: "Library", icon: PiBooks, link: "/library" },
   ];
 
   const [recentNovels, setRecentNovels] = useState<Novel[]>([]);
@@ -76,6 +79,11 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
       novels.push(JSON.parse(sessionStorage.getItem(key)));
     }
 
+    let settings = JSON.parse(localStorage.getItem("settings")) || {};
+    if (settings.pinMenu != undefined && settings.pinMenu != pinned) {
+      setPinned(settings.pinMenu);
+    }
+
     console.log(novels);
     setRecentNovels(novels);
   }, [setRecentNovels]);
@@ -83,45 +91,59 @@ const SideMenu = ({ menuOpen, setMenuOpen }) => {
   return (
     <div
       className={
-        ((!menuOpen && "collapse") || "overflow-y-auto") +
-        " sm:visible fixed top-0 bg-neutral-950 z-40 p-2 space-y-3 h-screen w-full sm:w-fit sm:max-w-[300px]"
+        "sm:visible fixed top-0 z-30 bg-neutral-950 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
+        (!menuOpen ? " collapse" : " overflow-y-auto min-w-[200px]") +
+        (!pinned && !menuOpen ? " sm:collapse" : "")
       }
     >
-      <div className="flex items-center">
-        <OpenMenuButton menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        {menuOpen && <Logo className="-my-10 mx-3" />}
+      <div className="space-y-2 pt-10">
+        {buttons.map((btn) => {
+          return (
+            <MenuButton
+              key={btn.text}
+              text={btn.text}
+              Icon={btn.icon}
+              link={btn.link}
+              showText={menuOpen}
+              setMenuOpen={setMenuOpen}
+            />
+          );
+        })}
+        {menuOpen && recentNovels.length > 0 && (
+          <>
+            <Divider />
+
+            {recentNovels.map((novel) => {
+              return (
+                <NovelButton
+                  key={novel.id}
+                  id={novel.id}
+                  title={novel.title}
+                  image={novel.cover}
+                  setMenuOpen={setMenuOpen}
+                />
+              );
+            })}
+          </>
+        )}
       </div>
 
-      {buttons.map((btn) => {
-        return (
-          <MenuButton
-            key={btn.text}
-            text={btn.text}
-            icon={btn.icon}
-            link={btn.link}
-            showText={menuOpen}
-            setMenuOpen={setMenuOpen}
-          />
-        );
-      })}
+      <div
+        onClick={() => {
+          let settings = JSON.parse(localStorage.getItem("settings")) || {};
+          settings.pinMenu = !pinned;
+          localStorage.setItem("settings", JSON.stringify(settings));
 
-      {menuOpen && recentNovels.length > 0 && (
-        <>
-          <Divider />
-
-          {recentNovels.map((novel) => {
-            return (
-              <NovelButton
-                key={novel.id}
-                id={novel.id}
-                title={novel.title}
-                image={novel.cover}
-                setMenuOpen={setMenuOpen}
-              />
-            );
-          })}
-        </>
-      )}
+          setPinned(!pinned);
+        }}
+        title={(pinned ? "Unpin" : "Pin") + " Sidebar"}
+        className={
+          "items-center w-fit hover:bg-neutral-800 text-neutral-600 p-1 rounded-md fade hidden sm:flex" +
+          (menuOpen || pinned ? "" : " collapse")
+        }
+      >
+        {(pinned && <PiPushPinFill size={24} />) || <PiPushPin size={24} />}
+      </div>
     </div>
   );
 };
@@ -140,7 +162,7 @@ const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
   );
 };
 
-const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
+const MenuButton = ({ text, Icon, link, showText, setMenuOpen }) => {
   return (
     <Link
       href={link}
@@ -150,7 +172,7 @@ const MenuButton = ({ text, icon, link, showText, setMenuOpen }) => {
       title={text}
       className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade"
     >
-      {icon}
+      <Icon size={24} />
       {showText && (
         <span className="mx-1 -my-1 font-semibold text-lg align-middle">
           {text}
