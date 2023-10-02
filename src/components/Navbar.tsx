@@ -60,7 +60,6 @@ const TopMenu = ({ menuOpen, className }) => {
   );
 };
 
-// TODO: update recent novel list w/o refresh, fix recent novel list title truncate
 const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   const buttons = [
     { text: "Home", icon: BiHomeAlt2, link: "/" },
@@ -183,6 +182,8 @@ const MenuButton = ({ text, Icon, link, showText, setMenuOpen }) => {
 };
 
 const NovelButton = ({ image, title, id, setMenuOpen }) => {
+  if (id == undefined) return;
+
   return (
     <Link
       href={"/novel/" + id}
