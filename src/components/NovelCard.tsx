@@ -11,7 +11,7 @@ const NovelCard = ({ title, image, width, height }: Props) => {
   return (
     <div className="group break-inside-avoid-column mb-5">
       <Image
-        className="rounded-md group-hover:border-lavender-600 border border-transparent fade"
+        className="rounded-md mb-2 group-hover:outline-lavender-600 outline-transparent outline outline-offset-2 fade"
         alt={title}
         src={image}
         radius={6}

@@ -38,7 +38,7 @@ export default function NovelList() {
   return (
     <div className="panel">
       <Title
-        className="mb-4 -m-4 p-4 sm:rounded-t-md bg-lavender-900 text-lavender-50"
+        className="mb-4 -m-4 p-4 sm:rounded-t-md bg-lavender-900 text-lavender-50 outline outline-1 outline-lavender-600"
         size="38px"
       >
         Featured
