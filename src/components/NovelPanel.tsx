@@ -35,8 +35,8 @@ const NovelPanel = ({ novel }: Props) => {
   }, [novel]);
 
   return (
-    <div className="sm:flex bg-stone-950 sm:rounded-md p-4">
-      <div className="relative w-fit h-fit my-2 mx-auto sm:mx-2 rounded-md border border-neutral-800">
+    <div className="sm:flex panel">
+      <div className="relative w-fit h-fit my-2 mx-auto sm:mx-2 rounded-md border border-zinc-700">
         <Image
           className="absolute blur-xl opacity-70"
           alt="Book Cover"
@@ -55,21 +55,16 @@ const NovelPanel = ({ novel }: Props) => {
         />
       </div>
       <div className="m-2">
-        <Title size="38px" className="text-center sm:text-left">
+        <Title
+          size="38px"
+          className="line-clamp-2 text-center sm:text-left"
+          title={novel.title}
+        >
           {novel.title}
         </Title>
-        <div>
-          <span>
-            By{" "}
-            <Text
-              td="underline"
-              className="text-sky-600"
-              component="a"
-              href="/"
-            >
-              {novel.author}
-            </Text>
-          </span>
+        <div className="flex space-x-2">
+          <span className="shrink-0">By </span>
+          <span className="text-lavender-600 line-clamp-1">{novel.author}</span>
         </div>
 
         <Group my="1rem" spacing="md">
@@ -89,7 +84,7 @@ const NovelPanel = ({ novel }: Props) => {
         </Group>
 
         <Button
-          className="me-2 bg-sky-600"
+          className="me-2 fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
           onClick={() => {
             location.href += "/" + lastRead;
           }}
@@ -100,7 +95,7 @@ const NovelPanel = ({ novel }: Props) => {
         {(inLibrary && (
           <Button
             variant="outline"
-            color="gray"
+            className="hover:bg-zinc-400/25 border border-zinc-400 text-zinc-400 fade-custom transition-colors"
             onClick={() => {
               removeFromLibrary(novel.id);
               setInLibrary(isInLibrary(novel.id));
@@ -110,7 +105,7 @@ const NovelPanel = ({ novel }: Props) => {
           </Button>
         )) || (
           <Button
-            className="border border-sky-600 text-sky-600 hover:bg-sky-600/10"
+            className="hover:bg-lavender-600/25 border border-lavender-600 text-lavender-600 fade-custom transition-colors"
             onClick={() => {
               addToLibrary(novel.id);
               setInLibrary(isInLibrary(novel.id));
@@ -163,7 +158,7 @@ interface GenreTagProps {
 const GenreTag = ({ genre }: GenreTagProps) => {
   return (
     <Button
-      className="me-1 rounded-full text-sky-600 bg-sky-600/25 hover:bg-sky-600/25 hover:border-sky-600"
+      className="me-1 rounded-full fade-custom transition-colors text-lavender-600 bg-lavender-900/25 hover:bg-lavender-600/25 hover:border-lavender-600"
       compact
     >
       {genre}
@@ -189,9 +184,13 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
   return (
     <div className="flex me-2">
       {filledStars.map((_item, index) => {
-        return <BiSolidStar key={"filledStar" + index} />;
+        return (
+          <BiSolidStar key={"filledStar" + index} className="text-amber-500" />
+        );
       })}
-      {Math.round(rating) > Math.floor(rating) && <BiSolidStarHalf />}
+      {Math.round(rating) > Math.floor(rating) && (
+        <BiSolidStarHalf className="text-amber-500" />
+      )}
       {emptyStars.map((_item, index) => {
         return <BiStar key={"emptyStar" + index} />;
       })}

@@ -14,17 +14,17 @@ export default function NovelPage() {
   const novelName = router.query.novel?.toString();
 
   const { data: novel, isLoading } = GetNovelData(novelName);
-  if (isLoading || !novel) return <LoadingScreen backUrl="/" />;
+  if (isLoading || !novel) return <LoadingScreen />;
   if (novel.error)
     return <ErrorScreen title="API Error">Novel not found</ErrorScreen>;
   sessionStorage.setItem(novel.id, JSON.stringify(novel));
 
   return (
-    <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
+    <>
       <NovelPanel novel={novel} />
       <LatestChapter chapter={novel.chapters[novel.chapters.length - 1]} />
       <ChapterList chapters={novel.chapters} />
-    </div>
+    </>
   );
 }
 
@@ -52,17 +52,17 @@ interface LatestChapterProps {
 
 const LatestChapter = ({ chapter }: LatestChapterProps) => {
   return (
-    <div className="p-4 flex flex-wrap sm:flex-nowrap justify-between sm:space-x-2 bg-stone-950 sm:rounded-md">
-      <span className="flex flex-none items-center me-2 sm:me-0">
+    <div className="flex flex-wrap sm:flex-nowrap justify-between panel">
+      <span className="flex items-center shrink-0 text-zinc-400">
         <BiSolidFile className="me-2" />
         Lastest Chapter
       </span>
-      <Link href={location.href + "/" + chapter.id}>
-        <span className="truncate sm:text-center grow text-neutral-400 hover:text-neutral-200 fade">
+      <Link href={location.href + "/" + chapter.id} title={chapter.title}>
+        <span className="line-clamp-1 sm:text-center hover:text-lavender-600 fade">
           {chapter.title}
         </span>
       </Link>
-      <span className="text-neutral-400/50">
+      <span className="text-zinc-500 shrink-0">
         {new RelativeTime().from(new Date(chapter.timestamp))}
       </span>
     </div>
