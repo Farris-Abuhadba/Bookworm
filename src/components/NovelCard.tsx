@@ -17,7 +17,7 @@ const NovelCard = ({ title, image, width, height }: Props) => {
         radius={6}
         withPlaceholder
       />
-      <Text className="mt-1 px-1 rounded-md transparent-button-hover">
+      <Text className="mt-1 px-1 rounded-md transparent-button-hover border border-transparent group-hover:border-lavender-600">
         {title}
       </Text>
     </div>
