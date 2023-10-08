@@ -1,4 +1,13 @@
-import { Image, NumberInput, Popover, Slider, Stack } from "@mantine/core";
+import {
+  ColorInput,
+  ColorPicker,
+  Image,
+  Modal,
+  NumberInput,
+  Slider,
+  Stack,
+} from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -9,9 +18,9 @@ import {
   BiRightArrowAlt,
 } from "react-icons/bi";
 import { useQuery } from "react-query";
-import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
+import { PiX, PiXBold, PiXFill } from "react-icons/pi";
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -26,6 +35,8 @@ export default function ChapterContent() {
     "my-" + getSetting("padding", router.isReady, 4)
   );
 
+  const [backgroundColor, setBackgroundColor] = useState("#0F0F0F");
+
   const { data: chapterData, isLoading } = useQuery({
     queryKey: ["chapter", novel, currentChapter],
     queryFn: () =>
@@ -35,8 +46,7 @@ export default function ChapterContent() {
     enabled: router.isReady,
   });
 
-  if (!router.isReady || isLoading)
-    return <LoadingScreen backUrl={"/novel/" + novel} />;
+  if (!router.isReady || isLoading) return <LoadingScreen />;
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
   if (lastReadChapters == undefined) lastReadChapters = {};
@@ -46,11 +56,24 @@ export default function ChapterContent() {
   const novelData = JSON.parse(sessionStorage.getItem(novel.toString()));
   if (!novelData) location.href = "/novel/" + novel;
 
-  if (chapterData.error != undefined)
-    return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
+  // if (chapterData.error != undefined)
+  //   return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
+
+  chapterData.title = "Chapter 1";
+  chapterData.id = "test";
+  chapterData.content = [
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
+  ];
 
   return (
-    <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
+    <>
       <ChapterHeader
         novel={novelData}
         chapter={chapterData}
@@ -58,7 +81,7 @@ export default function ChapterContent() {
         setPadding={setPadding}
       />
 
-      <div className="bg-neutral-950 sm:rounded-md p-4 px-7">
+      <div className="panel" style={{ backgroundColor }}>
         {chapterData.content.map((text, index) => {
           return (
             <p key={index} className={`${padding} ${fontSize}`}>
@@ -69,7 +92,7 @@ export default function ChapterContent() {
       </div>
 
       <ChapterControls novel={novelData} chapter={chapterData} />
-    </div>
+    </>
   );
 }
 
@@ -86,11 +109,13 @@ const ChapterHeader = ({
   setFontSize,
   setPadding,
 }: ChapterHeaderProps) => {
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
-    <div className="bg-neutral-950 sm:rounded-md sm:p-4 sm:px-7 flex justify-between items-center">
+    <div className="panel flex justify-between items-center">
       <div className="flex">
         <Image
-          className="hidden sm:block my-2 rounded-md border border-neutral-800"
+          className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded-md border border-zinc-700"
           alt={novel.title}
           src={novel.cover}
           height={100}
@@ -100,25 +125,41 @@ const ChapterHeader = ({
         />
         <div className="m-5">
           <a
-            className="text-2xl sm:text-4xl font-bold hover:text-sky-600 hover:underline"
+            className="text-2xl sm:leading-[2.75rem] sm:text-4xl font-bold line-clamp-1 hover:text-lavender-600 fade"
             href={"/novel/" + novel.id}
+            title={novel.title}
           >
             {novel.title}
           </a>
-          <p className="text-xl">{chapter.title}</p>
+          <p className="text-xl line-clamp-1" title={chapter.title}>
+            {chapter.title}
+          </p>
         </div>
       </div>
 
-      <Popover>
-        <Popover.Target>
-          <div className="hidden sm:block hover:bg-neutral-800 p-1 rounded-md fade">
-            <BiCog title="Settings" size={25} />
-          </div>
-        </Popover.Target>
-        <Popover.Dropdown>
-          <ChapterSettings setFontSize={setFontSize} setPadding={setPadding} />
-        </Popover.Dropdown>
-      </Popover>
+      <Modal
+        opened={opened}
+        onClose={close}
+        padding={0}
+        radius={0}
+        centered
+        withCloseButton={false}
+      >
+        {/* <ChapterSettings setFontSize={setFontSize} setPadding={setPadding} /> */}
+        <ChapterSettingsNew
+          applySettings={() => {
+            console.log("Applying Settings");
+          }}
+          closeModal={close}
+        />
+      </Modal>
+
+      <div
+        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
+        onClick={open}
+      >
+        <BiCog title="Settings" size={25} />
+      </div>
     </div>
   );
 };
@@ -129,7 +170,7 @@ interface ChapterControlsProps {
 }
 
 const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
-  var currentChapterIndex;
+  var currentChapterIndex = 0;
   novel.chapters.forEach((c, index) => {
     if (c.id == chapter.id) {
       currentChapterIndex = index;
@@ -143,11 +184,11 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
     novel.chapters[currentChapterIndex + 1].id;
 
   return (
-    <div className="bg-neutral-950 sm:rounded-md p-4 px-7 flex justify-between items-center">
+    <div className="panel flex justify-between items-center">
       <Link
         href={`/novel/${novel.id}/${prevChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md fade " +
+          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
           (currentChapterIndex - 1 < 0 && "invisible")
         }
       >
@@ -156,7 +197,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 
       <Link
         href={`/novel/${novel.id}`}
-        className="hover:bg-neutral-800 p-1 rounded-md fade"
+        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
       >
         <BiListUl title="Chapter List" size={24} />
       </Link>
@@ -164,13 +205,74 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
       <Link
         href={`/novel/${novel.id}/${nextChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md fade " +
+          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
           (currentChapterIndex + 1 >= novel.chapters.length && "invisible")
         }
       >
         <BiRightArrowAlt title="Next Chapter" size={24} />
       </Link>
     </div>
+  );
+};
+
+const ChapterSettingsNew = ({ applySettings, closeModal }) => {
+  return (
+    <div className="panel sm:my-0 space-y-4">
+      <div className="flex justify-between">
+        <span className="font-bold">Chapter Settings</span>
+        <div
+          className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
+          onClick={closeModal}
+        >
+          <PiXBold title="Close" />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 justify-items-end items-center">
+        <SettingInputNumber
+          name="Font Size"
+          value={10}
+          defaultValue={2}
+          min={8}
+          max={72}
+        />
+        <SettingInputNumber name="Paragraph Spacing" value={0} />
+        <SettingInputNumber name="Line Height" value={0} />
+
+        <SettingInputColor name="Font Color" value="#FF0000" />
+        <SettingInputColor name="Background Color" value="#FF0000" />
+      </div>
+    </div>
+  );
+};
+
+const SettingInputNumber = ({
+  name,
+  value,
+  defaultValue = value,
+  min = 0,
+  max = 100,
+  getValue = null,
+}) => {
+  return (
+    <>
+      <span>{name}</span>
+      <NumberInput
+        value={value}
+        min={min}
+        max={max}
+        placeholder={"Default: " + defaultValue}
+      />
+    </>
+  );
+};
+
+const SettingInputColor = ({ name, value }) => {
+  return (
+    <>
+      <span>{name}</span>
+      <ColorInput value={value} />
+    </>
   );
 };
 
