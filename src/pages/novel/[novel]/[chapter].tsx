@@ -1,12 +1,4 @@
-import {
-  ColorInput,
-  ColorPicker,
-  Image,
-  Modal,
-  NumberInput,
-  Slider,
-  Stack,
-} from "@mantine/core";
+import { Image, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -20,7 +12,7 @@ import {
 import { useQuery } from "react-query";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
-import { PiX, PiXBold, PiXFill } from "react-icons/pi";
+import ChapterSettings from "../../../components/ChapterSettings";
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -74,12 +66,7 @@ export default function ChapterContent() {
 
   return (
     <>
-      <ChapterHeader
-        novel={novelData}
-        chapter={chapterData}
-        setFontSize={setFontSize}
-        setPadding={setPadding}
-      />
+      <ChapterHeader novel={novelData} chapter={chapterData} />
 
       <div className="panel" style={{ backgroundColor }}>
         {chapterData.content.map((text, index) => {
@@ -99,18 +86,9 @@ export default function ChapterContent() {
 interface ChapterHeaderProps {
   novel: Novel;
   chapter: Chapter;
-  setFontSize;
-  setPadding;
 }
 
-const ChapterHeader = ({
-  novel,
-  chapter,
-  setFontSize,
-  setPadding,
-}: ChapterHeaderProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
-
+const ChapterHeader = ({ novel, chapter }: ChapterHeaderProps) => {
   return (
     <div className="panel flex justify-between items-center">
       <div className="flex">
@@ -137,29 +115,7 @@ const ChapterHeader = ({
         </div>
       </div>
 
-      <Modal
-        opened={opened}
-        onClose={close}
-        padding={0}
-        radius={0}
-        centered
-        withCloseButton={false}
-      >
-        {/* <ChapterSettings setFontSize={setFontSize} setPadding={setPadding} /> */}
-        <ChapterSettingsNew
-          applySettings={() => {
-            console.log("Applying Settings");
-          }}
-          closeModal={close}
-        />
-      </Modal>
-
-      <div
-        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
-        onClick={open}
-      >
-        <BiCog title="Settings" size={25} />
-      </div>
+      <ChapterSettings />
     </div>
   );
 };
@@ -212,107 +168,6 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
         <BiRightArrowAlt title="Next Chapter" size={24} />
       </Link>
     </div>
-  );
-};
-
-const ChapterSettingsNew = ({ applySettings, closeModal }) => {
-  return (
-    <div className="panel sm:my-0 space-y-4">
-      <div className="flex justify-between">
-        <span className="font-bold">Chapter Settings</span>
-        <div
-          className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
-          onClick={closeModal}
-        >
-          <PiXBold title="Close" />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-x-4 gap-y-2 justify-items-end items-center">
-        <SettingInputNumber
-          name="Font Size"
-          value={10}
-          defaultValue={2}
-          min={8}
-          max={72}
-        />
-        <SettingInputNumber name="Paragraph Spacing" value={0} />
-        <SettingInputNumber name="Line Height" value={0} />
-
-        <SettingInputColor name="Font Color" value="#FF0000" />
-        <SettingInputColor name="Background Color" value="#FF0000" />
-      </div>
-    </div>
-  );
-};
-
-const SettingInputNumber = ({
-  name,
-  value,
-  defaultValue = value,
-  min = 0,
-  max = 100,
-  getValue = null,
-}) => {
-  return (
-    <>
-      <span>{name}</span>
-      <NumberInput
-        value={value}
-        min={min}
-        max={max}
-        placeholder={"Default: " + defaultValue}
-      />
-    </>
-  );
-};
-
-const SettingInputColor = ({ name, value }) => {
-  return (
-    <>
-      <span>{name}</span>
-      <ColorInput value={value} />
-    </>
-  );
-};
-
-const ChapterSettings = ({ setFontSize, setPadding }) => {
-  var savedFontSize = getSetting("fontSize", true, 2);
-  var savedPadding = getSetting("padding", true, 4);
-
-  return (
-    <Stack className="items-end" spacing="xl">
-      <div className="flex items-center">
-        <span>Font Size</span>
-        <Slider
-          className="mx-2"
-          w={300}
-          max={fontSizes.length - 1}
-          defaultValue={savedFontSize}
-          label={null}
-          marks={fontSizes}
-          onChange={(value) => {
-            setSetting("fontSize", value);
-            setFontSize(fontSizes[value].tailwind);
-          }}
-        />
-      </div>
-      <div className="flex items-center mb-3">
-        <span>Paragraph Spacing</span>
-        <NumberInput
-          className="mx-2"
-          w={300}
-          defaultValue={savedPadding}
-          min={0}
-          max={12}
-          placeholder="Default: 4"
-          onChange={(value) => {
-            setSetting("padding", value);
-            setPadding(`my-${value}`);
-          }}
-        />
-      </div>
-    </Stack>
   );
 };
 
