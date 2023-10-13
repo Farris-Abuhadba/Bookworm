@@ -1,33 +1,68 @@
-import { Image, Modal } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import {
-  BiCog,
-  BiLeftArrowAlt,
-  BiListUl,
-  BiRightArrowAlt,
-} from "react-icons/bi";
+import { BiLeftArrowAlt, BiListUl, BiRightArrowAlt } from "react-icons/bi";
 import { useQuery } from "react-query";
+import { ChapterSettings, Setting } from "../../../components/ChapterSettings";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
-import ChapterSettings from "../../../components/ChapterSettings";
 
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  const [fontSize, setFontSize] = useState<string>(
-    fontSizes[getSetting("fontSize", router.isReady, 2)].tailwind
-  );
+  const properties = {
+    fontSize: {
+      name: "Font Size",
+      type: "number",
+      defaultValue: 16,
+      state: useState(16),
+      min: 8,
+      max: 72,
+    },
 
-  const [padding, setPadding] = useState<string>(
-    "my-" + getSetting("padding", router.isReady, 4)
-  );
+    lineHeight: {
+      name: "Line Height",
+      type: "number",
+      defaultValue: 1.5,
+      state: useState(1.5),
+      min: 1,
+      max: 5,
+      precision: 1,
+      step: 0.5,
+    },
 
-  const [backgroundColor, setBackgroundColor] = useState("#0F0F0F");
+    paragraphSpacing: {
+      name: "Paragraph Spacing",
+      type: "number",
+      defaultValue: 32,
+      state: useState(32),
+      min: 0,
+      max: 100,
+    },
+
+    textColor: {
+      name: "Text Color",
+      type: "color",
+      defaultValue: "#D4D4D8",
+      state: useState("#D4D4D8"),
+    },
+
+    backgroundColor: {
+      name: "Background Color",
+      type: "color",
+      defaultValue: "#27272A",
+      state: useState("#27272A"),
+    },
+  };
+
+  const fontSize = properties.fontSize.state[0];
+  const lineHeight = properties.lineHeight.state[0];
+  const paragraphSpacing = properties.paragraphSpacing.state[0];
+  const textColor = properties.textColor.state[0];
+  const backgroundColor = properties.backgroundColor.state[0];
 
   const { data: chapterData, isLoading } = useQuery({
     queryKey: ["chapter", novel, currentChapter],
@@ -53,25 +88,40 @@ export default function ChapterContent() {
 
   chapterData.title = "Chapter 1";
   chapterData.id = "test";
-  chapterData.content = [
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-    "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest",
-  ];
+  chapterData.content = [];
+
+  for (let i = 0; i < 10; i++) {
+    chapterData.content.push(
+      "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest"
+    );
+  }
 
   return (
     <>
-      <ChapterHeader novel={novelData} chapter={chapterData} />
+      <ChapterHeader
+        novel={novelData}
+        chapter={chapterData}
+        settings={Object.keys(properties).map((key) => {
+          let property: Setting = properties[key];
+          property.id = key;
+
+          return property;
+        })}
+      />
 
       <div className="panel" style={{ backgroundColor }}>
         {chapterData.content.map((text, index) => {
           return (
-            <p key={index} className={`${padding} ${fontSize}`}>
+            <p
+              key={index}
+              style={{
+                margin:
+                  index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
+                fontSize: fontSize + "px",
+                lineHeight: lineHeight,
+                color: textColor,
+              }}
+            >
               {text}
             </p>
           );
@@ -86,11 +136,12 @@ export default function ChapterContent() {
 interface ChapterHeaderProps {
   novel: Novel;
   chapter: Chapter;
+  settings: Setting[];
 }
 
-const ChapterHeader = ({ novel, chapter }: ChapterHeaderProps) => {
+const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
   return (
-    <div className="panel flex justify-between items-center">
+    <div className="panel flex justify-between items-center text-xl">
       <div className="flex">
         <Image
           className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded-md border border-zinc-700"
@@ -115,7 +166,7 @@ const ChapterHeader = ({ novel, chapter }: ChapterHeaderProps) => {
         </div>
       </div>
 
-      <ChapterSettings />
+      <ChapterSettings properties={settings} />
     </div>
   );
 };
@@ -194,29 +245,3 @@ const setSetting = (key: string, value: any) => {
   settings[key] = value;
   localStorage.setItem("settings", JSON.stringify(settings));
 };
-
-const fontSizes = [
-  { value: 0, label: 12, tailwind: "text-xs" },
-  { value: 1, label: 14, tailwind: "text-sm" },
-  { value: 2, label: 16, tailwind: "text-base" },
-  { value: 3, label: 18, tailwind: "text-lg" },
-  { value: 4, label: 20, tailwind: "text-xl" },
-  { value: 5, label: 24, tailwind: "text-2xl" },
-  { value: 6, label: 34, tailwind: "text-3xl" },
-  { value: 7, label: 36, tailwind: "text-4xl" },
-  { value: 8, label: 48, tailwind: "text-5xl" },
-];
-
-// === Tailwind Triggers ===
-// my-1
-// my-2
-// my-3
-// my-4
-// my-5
-// my-6
-// my-7
-// my-8
-// my-9
-// my-10
-// my-11
-// my-12

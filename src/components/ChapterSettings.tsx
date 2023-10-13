@@ -4,31 +4,36 @@ import { useState } from "react";
 import { BiCog } from "react-icons/bi";
 import { PiXBold } from "react-icons/pi";
 
-interface Setting {
+export interface Setting {
   id: string;
   name: string;
   type: "number" | "color";
+
+  defaultValue: any;
+  state: [any, (value: any) => void];
 }
 
 interface NumberSetting extends Setting {
-  value: number;
-  setValue(newValue: number): void;
+  defaultValue: number;
+  min?: number;
+  max?: number;
+  precision?: number;
+  step?: number;
+
+  state: [number, (value: number) => void];
+}
+
+interface ColorSetting extends Setting {
+  defaultValue: string;
+
+  state: [string, (value: string) => void];
 }
 
 interface ChapterSettingsProps {
-  properties: {
-    fontSize: [number, any];
-    padding: [number, any];
-    lineHeight: [number, any];
-
-    textColor: [string, any];
-    backgroundColor: [string, any];
-  };
-
-  closeModal?: any;
+  properties: Setting[];
 }
 
-const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
+export const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
@@ -41,7 +46,7 @@ const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
         centered
         withCloseButton={false}
       >
-        <SettingsModal closeModal={close} />
+        <SettingsModal closeModal={close} properties={properties} />
       </Modal>
 
       <div
@@ -54,12 +59,16 @@ const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
   );
 };
 
-const SettingsModal = ({ closeModal, properties }: ChapterSettingsProps) => {
+interface SettingsModalProps extends ChapterSettingsProps {
+  closeModal(): void;
+}
+
+const SettingsModal = ({ closeModal, properties }: SettingsModalProps) => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  function updateValue(current, setValue, newValue) {
-    if (current != newValue) {
-      setValue(newValue);
+  function updateValue(state, newValue) {
+    if (state[0] != newValue) {
+      state[1](newValue);
       if (!unsavedChanges) setUnsavedChanges(true);
     }
   }
@@ -77,45 +86,27 @@ const SettingsModal = ({ closeModal, properties }: ChapterSettingsProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 justify-items-end items-center">
-        <SettingInputNumber
-          name="Font Size"
-          value={10}
-          defaultValue={2}
-          min={8}
-          max={72}
-          OnChange={(value) => {
-            updateValue(fontSize, setFontSize, value);
-          }}
-        />
-        <SettingInputNumber
-          name="Paragraph Spacing"
-          value={0}
-          OnChange={(value) => {
-            updateValue(padding, setPadding, value);
-          }}
-        />
-        <SettingInputNumber
-          name="Line Height"
-          value={0}
-          OnChange={(value) => {
-            updateValue(lineHeight, setLineHeight, value);
-          }}
-        />
-
-        <SettingInputColor
-          name="Text Color"
-          value="#D4D4D9"
-          onChangeEnd={(color: string) => {
-            updateValue(textColor, setTextColor, color);
-          }}
-        />
-        <SettingInputColor
-          name="Background Color"
-          value="#FF0000"
-          onChangeEnd={(color: string) => {
-            updateValue(backgroundColor, setBackgroundColor, color);
-          }}
-        />
+        {properties.map((property) => {
+          if (property.type == "number")
+            return (
+              <SettingInputNumber
+                property={property}
+                onChange={(newValue) => {
+                  updateValue(property.state, newValue);
+                }}
+              />
+            );
+          else if (property.type == "color")
+            return (
+              <SettingInputColor
+                property={property}
+                onChange={(newValue) => {
+                  updateValue(property.state, newValue);
+                }}
+              />
+            );
+          else return <></>;
+        })}
       </div>
     </div>
   );
@@ -123,41 +114,40 @@ const SettingsModal = ({ closeModal, properties }: ChapterSettingsProps) => {
 
 export default ChapterSettings;
 
-const SettingInputNumber = ({
-  name,
-  value,
-  defaultValue = value,
-  min = 0,
-  max = 100,
-  OnChange,
-}) => {
+interface SettingInputProps {
+  property: Setting;
+  onChange(value: any): void;
+}
+
+const SettingInputNumber = ({ property, onChange }: SettingInputProps) => {
+  let p: NumberSetting = property;
+
   return (
     <>
-      <span>{name}</span>
+      <span>{p.name}</span>
       <NumberInput
-        defaultValue={value}
-        min={min}
-        max={max}
-        placeholder={defaultValue}
-        onChange={OnChange}
+        defaultValue={p.state[0]}
+        precision={p.precision || 0}
+        step={p.step || 1}
+        min={p.min || 0}
+        max={p.max || 100}
+        placeholder={p.defaultValue.toString()}
+        onChange={onChange}
       />
     </>
   );
 };
 
-const SettingInputColor = ({
-  name,
-  value,
-  defaultValue = value,
-  onChangeEnd,
-}) => {
+const SettingInputColor = ({ property, onChange }: SettingInputProps) => {
+  let p: ColorSetting = property;
+
   return (
     <>
-      <span>{name}</span>
+      <span>{p.name}</span>
       <ColorInput
-        placeholder={defaultValue}
-        defaultValue={value}
-        onChangeEnd={onChangeEnd}
+        defaultValue={p.state[0]}
+        placeholder={p.defaultValue}
+        onChangeEnd={onChange}
       />
     </>
   );
