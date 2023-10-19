@@ -1,4 +1,4 @@
-import { ColorInput, Modal, NumberInput } from "@mantine/core";
+import { Button, ColorInput, Modal, NumberInput } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { BiCog } from "react-icons/bi";
@@ -108,6 +108,32 @@ const SettingsModal = ({ closeModal, properties }: SettingsModalProps) => {
           else return <></>;
         })}
       </div>
+
+      <div className="flex justify-end space-x-2">
+        <Button
+          className="hover:bg-red-400/25 border border-red-400 text-red-400 fade-custom transition-colors"
+          onClick={() => {
+            properties.forEach((property) => {
+              updateValue(property.state, property.defaultValue);
+            });
+          }}
+        >
+          Reset
+        </Button>
+
+        <Button
+          className="me-2 fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
+          onClick={() => {
+            properties.forEach((property) => {
+              setSetting(property.id, property.state[0]);
+            });
+            setUnsavedChanges(false);
+          }}
+          disabled={!unsavedChanges}
+        >
+          Save
+        </Button>
+      </div>
     </div>
   );
 };
@@ -126,7 +152,7 @@ const SettingInputNumber = ({ property, onChange }: SettingInputProps) => {
     <>
       <span>{p.name}</span>
       <NumberInput
-        defaultValue={p.state[0]}
+        value={p.state[0]}
         precision={p.precision || 0}
         step={p.step || 1}
         min={p.min || 0}
@@ -145,10 +171,29 @@ const SettingInputColor = ({ property, onChange }: SettingInputProps) => {
     <>
       <span>{p.name}</span>
       <ColorInput
-        defaultValue={p.state[0]}
+        value={p.state[0]}
         placeholder={p.defaultValue}
         onChangeEnd={onChange}
       />
     </>
   );
+};
+
+export const getSetting = (key: string, defaultValue?: any) => {
+  var settings = JSON.parse(localStorage.getItem("settings"));
+  if (settings == undefined) return defaultValue;
+
+  let storedValue = settings[key];
+
+  if (storedValue == undefined) return defaultValue;
+
+  return storedValue;
+};
+
+const setSetting = (key: string, value: any) => {
+  var settings = JSON.parse(localStorage.getItem("settings"));
+  if (settings == undefined) settings = {};
+
+  settings[key] = value;
+  localStorage.setItem("settings", JSON.stringify(settings));
 };

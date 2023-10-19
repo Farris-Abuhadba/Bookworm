@@ -1,10 +1,15 @@
 import { Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BiLeftArrowAlt, BiListUl, BiRightArrowAlt } from "react-icons/bi";
 import { useQuery } from "react-query";
-import { ChapterSettings, Setting } from "../../../components/ChapterSettings";
+import {
+  ChapterSettings,
+  Setting,
+  getSetting,
+} from "../../../components/ChapterSettings";
+import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
 
@@ -73,6 +78,15 @@ export default function ChapterContent() {
     enabled: router.isReady,
   });
 
+  useEffect(() => {
+    Object.keys(properties).forEach((key) => {
+      let saved = getSetting(key);
+      if (saved != undefined) {
+        properties[key].state[1](saved);
+      }
+    });
+  }, []);
+
   if (!router.isReady || isLoading) return <LoadingScreen />;
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
@@ -83,18 +97,8 @@ export default function ChapterContent() {
   const novelData = JSON.parse(sessionStorage.getItem(novel.toString()));
   if (!novelData) location.href = "/novel/" + novel;
 
-  // if (chapterData.error != undefined)
-  //   return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
-
-  chapterData.title = "Chapter 1";
-  chapterData.id = "test";
-  chapterData.content = [];
-
-  for (let i = 0; i < 10; i++) {
-    chapterData.content.push(
-      "pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest pack careful also honor five primitive obtain nervous adjective crowd rule instant tide offer appropriate phrase balloon congress mice news birds onto made nametest"
-    );
-  }
+  if (chapterData.error != undefined)
+    return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
 
   return (
     <>
@@ -220,28 +224,4 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
       </Link>
     </div>
   );
-};
-
-const getSetting = (key: string, ready: boolean, defaultValue: any) => {
-  let storedValue;
-
-  if (ready) {
-    var settings = JSON.parse(localStorage.getItem("settings"));
-    if (settings == undefined) return defaultValue;
-
-    storedValue = settings[key];
-  }
-
-  if (storedValue == undefined || Number.isNaN(storedValue))
-    return defaultValue;
-
-  return storedValue;
-};
-
-const setSetting = (key: string, value: any) => {
-  var settings = JSON.parse(localStorage.getItem("settings"));
-  if (settings == undefined) settings = {};
-
-  settings[key] = value;
-  localStorage.setItem("settings", JSON.stringify(settings));
 };
