@@ -14,8 +14,11 @@ const LibraryPage = () => {
   }, []);
 
   return (
-    <div className="sm:container sm:my-5 mx-auto p-4 sm:rounded-md bg-neutral-800 space-y-2">
-      <Title className="bg-neutral-950 -m-4 p-4 sm:rounded-t-md mb-2">
+    <div className="panel space-y-2">
+      <Title
+        className="mb-4 -m-4 p-4 sm:rounded-t-md bg-lavender-900 text-lavender-50 outline outline-1 outline-lavender-600"
+        size="38px"
+      >
         Library
       </Title>
       {novelLibrary.map((novelId, index) => {
@@ -40,12 +43,10 @@ const NovelRow = ({ novelId, index }) => {
     );
   if (isLoading || !novel) return <NovelRowSkeletonLoader index={index} />;
 
-  let lastRead;
+  let lastRead = "";
   try {
     lastRead = JSON.parse(localStorage.getItem("lastReadChapters"))[novelId];
-  } catch {
-    lastRead = "";
-  }
+  } catch {}
 
   let progress = 0;
   novel.chapters.forEach((chapter: Chapter, index: number) => {
@@ -56,16 +57,16 @@ const NovelRow = ({ novelId, index }) => {
 
   return (
     <>
-      {index != 0 && <Divider size="sm" />}
+      {index != 0 && <Divider size="sm" className="border-zinc-700" />}
       <div className="flex items-center justify-between overflow-clip">
         <Link
           href={"/novel/" + novel.id}
-          className="flex items-center space-x-2 group rounded p-2 hover:bg-neutral-700 fade grow"
+          className="flex items-center space-x-2 group rounded-md p-2 transparent-button-hover hover:bg-zinc-500/25 grow"
         >
           <span>{index + 1}</span>
           <div className="w-[64px] h-[80px]">
             <Image
-              className="rounded-md group-hover:border-neutral-500 border border-transparent fade"
+              className="rounded-md fade border border-zinc-700 group-hover:border-lavender-600"
               radius={6}
               width={64}
               height={80}
@@ -81,14 +82,21 @@ const NovelRow = ({ novelId, index }) => {
             progress={progress}
             maxProgress={novel.chapters.length}
           />
-          <Button className="bg-sky-600">Read</Button>
+          <Button
+            className="fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
+            onClick={() => {
+              location.href = "/novel/" + novelId + "/" + lastRead;
+            }}
+          >
+            Read
+          </Button>
           <Menu>
             <Menu.Target>
-              <div className="rounded hover:bg-neutral-700 fade p-2">
+              <div className="p-2 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600">
                 <BiDotsVerticalRounded size={18} />
               </div>
             </Menu.Target>
-            <Menu.Dropdown>
+            <Menu.Dropdown className="bg-zinc-800 border-zinc-600">
               <Menu.Item
                 color="red"
                 icon={<BiTrashAlt size={18} />}
@@ -116,6 +124,8 @@ const NovelRowProgressBar = ({ progress, maxProgress }) => {
         value={(progress / maxProgress) * 100}
         w={250}
         striped={progress >= maxProgress}
+        color="#7770bb"
+        className="bg-zinc-700"
       />
       <span>{progress}</span>
       <span className="right-0 absolute">{maxProgress}</span>
@@ -126,7 +136,7 @@ const NovelRowProgressBar = ({ progress, maxProgress }) => {
 const RemovedNovelRow = ({ novel, index, removeRow }) => {
   return (
     <>
-      {index != 0 && <Divider size="sm" />}
+      {index != 0 && <Divider size="sm" className="border-zinc-700" />}
       <div className="flex bg-red-500/5 p-2 rounded-md justify-between items-center">
         <div className="flex space-x-2 text-red-500 items-center">
           <span>{index + 1}</span>
@@ -153,27 +163,27 @@ const NovelRowSkeletonLoader = ({ index }) => {
       <div className="w-full flex justify-between items-center">
         <div className="flex items-center space-x-2 p-2 grow">
           <span>{index + 1}</span>
-          <div className="animate-pulse rounded-md bg-neutral-700 h-[80px] w-[64px]" />
+          <div className="animate-pulse rounded-md bg-zinc-700 h-[80px] w-[64px]" />
           <div className="animate-pulse flex-1">
             <div className="space-y-3">
               <div className="grid grid-cols-3 gap-2">
-                <div className="h-4 bg-neutral-700 rounded col-span-2"></div>
-                <div className="h-4 bg-neutral-700 rounded col-span-1"></div>
+                <div className="h-4 bg-zinc-700 rounded col-span-2"></div>
+                <div className="h-4 bg-zinc-700 rounded col-span-1"></div>
               </div>
-              <div className="h-4 bg-neutral-700 rounded"></div>
+              <div className="h-4 bg-zinc-700 rounded"></div>
             </div>
           </div>
         </div>
         <div className="animate-pulse flex space-x-2 items-center">
           <div className="mx-5 hidden md:block relative space-y-1">
-            <div className="w-[250px] h-2 bg-neutral-700 rounded-full" />
-            <div className="w-6 h-3 rounded bg-neutral-700" />
-            <div className="w-10 h-3 rounded bg-neutral-700 right-0 bottom-0 absolute" />
+            <div className="w-[250px] h-2 bg-zinc-700 rounded-full" />
+            <div className="w-6 h-3 rounded bg-zinc-700" />
+            <div className="w-10 h-3 rounded bg-zinc-700 right-0 bottom-0 absolute" />
           </div>
-          <Button className="bg-neutral-700 text-transparent rounded-md hover:bg-neutral-700 pointer-events-none">
+          <Button className="bg-zinc-700 text-transparent rounded-md hover:bg-zinc-700 pointer-events-none">
             Read
           </Button>
-          <div className="w-[34px] h-[34px] bg-neutral-700 rounded-md" />
+          <div className="w-[34px] h-[34px] bg-zinc-700 rounded-md" />
         </div>
       </div>
     </>
