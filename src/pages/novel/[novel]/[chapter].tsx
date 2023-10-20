@@ -1,14 +1,14 @@
-import { Image, NumberInput, Popover, Slider, Stack } from "@mantine/core";
+import { Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import {
-  BiCog,
-  BiLeftArrowAlt,
-  BiListUl,
-  BiRightArrowAlt,
-} from "react-icons/bi";
+import { useEffect, useState } from "react";
+import { BiLeftArrowAlt, BiListUl, BiRightArrowAlt } from "react-icons/bi";
 import { useQuery } from "react-query";
+import {
+  ChapterSettings,
+  Setting,
+  getSetting,
+} from "../../../components/ChapterSettings";
 import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
@@ -18,13 +18,56 @@ export default function ChapterContent() {
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  const [fontSize, setFontSize] = useState<string>(
-    fontSizes[getSetting("fontSize", router.isReady, 2)].tailwind
-  );
+  const properties = {
+    fontSize: {
+      name: "Font Size",
+      type: "number",
+      defaultValue: 16,
+      state: useState(16),
+      min: 8,
+      max: 72,
+    },
 
-  const [padding, setPadding] = useState<string>(
-    "my-" + getSetting("padding", router.isReady, 4)
-  );
+    lineHeight: {
+      name: "Line Height",
+      type: "number",
+      defaultValue: 1.5,
+      state: useState(1.5),
+      min: 1,
+      max: 5,
+      precision: 1,
+      step: 0.5,
+    },
+
+    paragraphSpacing: {
+      name: "Paragraph Spacing",
+      type: "number",
+      defaultValue: 32,
+      state: useState(32),
+      min: 0,
+      max: 100,
+    },
+
+    textColor: {
+      name: "Text Color",
+      type: "color",
+      defaultValue: "#D4D4D8",
+      state: useState("#D4D4D8"),
+    },
+
+    backgroundColor: {
+      name: "Background Color",
+      type: "color",
+      defaultValue: "#27272A",
+      state: useState("#27272A"),
+    },
+  };
+
+  const fontSize = properties.fontSize.state[0];
+  const lineHeight = properties.lineHeight.state[0];
+  const paragraphSpacing = properties.paragraphSpacing.state[0];
+  const textColor = properties.textColor.state[0];
+  const backgroundColor = properties.backgroundColor.state[0];
 
   const { data: chapterData, isLoading } = useQuery({
     queryKey: ["chapter", novel, currentChapter],
@@ -35,8 +78,16 @@ export default function ChapterContent() {
     enabled: router.isReady,
   });
 
-  if (!router.isReady || isLoading)
-    return <LoadingScreen backUrl={"/novel/" + novel} />;
+  useEffect(() => {
+    Object.keys(properties).forEach((key) => {
+      let saved = getSetting(key);
+      if (saved != undefined) {
+        properties[key].state[1](saved);
+      }
+    });
+  }, []);
+
+  if (!router.isReady || isLoading) return <LoadingScreen />;
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
   if (lastReadChapters == undefined) lastReadChapters = {};
@@ -50,18 +101,31 @@ export default function ChapterContent() {
     return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
 
   return (
-    <div className="sm:w-4/5 mx-auto sm:my-5 space-y-1 sm:space-y-2">
+    <>
       <ChapterHeader
         novel={novelData}
         chapter={chapterData}
-        setFontSize={setFontSize}
-        setPadding={setPadding}
+        settings={Object.keys(properties).map((key) => {
+          let property: Setting = properties[key];
+          property.id = key;
+
+          return property;
+        })}
       />
 
-      <div className="bg-neutral-950 sm:rounded-md p-4 px-7">
+      <div className="panel" style={{ backgroundColor }}>
         {chapterData.content.map((text, index) => {
           return (
-            <p key={index} className={`${padding} ${fontSize}`}>
+            <p
+              key={index}
+              style={{
+                margin:
+                  index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
+                fontSize: fontSize + "px",
+                lineHeight: lineHeight,
+                color: textColor,
+              }}
+            >
               {text}
             </p>
           );
@@ -69,28 +133,22 @@ export default function ChapterContent() {
       </div>
 
       <ChapterControls novel={novelData} chapter={chapterData} />
-    </div>
+    </>
   );
 }
 
 interface ChapterHeaderProps {
   novel: Novel;
   chapter: Chapter;
-  setFontSize;
-  setPadding;
+  settings: Setting[];
 }
 
-const ChapterHeader = ({
-  novel,
-  chapter,
-  setFontSize,
-  setPadding,
-}: ChapterHeaderProps) => {
+const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
   return (
-    <div className="bg-neutral-950 sm:rounded-md sm:p-4 sm:px-7 flex justify-between items-center">
+    <div className="panel flex justify-between items-center text-xl">
       <div className="flex">
         <Image
-          className="hidden sm:block my-2 rounded-md border border-neutral-800"
+          className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded-md border border-zinc-700"
           alt={novel.title}
           src={novel.cover}
           height={100}
@@ -100,25 +158,19 @@ const ChapterHeader = ({
         />
         <div className="m-5">
           <a
-            className="text-2xl sm:text-4xl font-bold hover:text-sky-600 hover:underline"
+            className="text-2xl sm:leading-[2.75rem] sm:text-4xl font-bold line-clamp-1 hover:text-lavender-600 fade"
             href={"/novel/" + novel.id}
+            title={novel.title}
           >
             {novel.title}
           </a>
-          <p className="text-xl">{chapter.title}</p>
+          <p className="text-xl line-clamp-1" title={chapter.title}>
+            {chapter.title}
+          </p>
         </div>
       </div>
 
-      <Popover>
-        <Popover.Target>
-          <div className="hidden sm:block hover:bg-neutral-800 p-1 rounded-md fade">
-            <BiCog title="Settings" size={25} />
-          </div>
-        </Popover.Target>
-        <Popover.Dropdown>
-          <ChapterSettings setFontSize={setFontSize} setPadding={setPadding} />
-        </Popover.Dropdown>
-      </Popover>
+      <ChapterSettings properties={settings} />
     </div>
   );
 };
@@ -129,7 +181,7 @@ interface ChapterControlsProps {
 }
 
 const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
-  var currentChapterIndex;
+  var currentChapterIndex = 0;
   novel.chapters.forEach((c, index) => {
     if (c.id == chapter.id) {
       currentChapterIndex = index;
@@ -143,11 +195,11 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
     novel.chapters[currentChapterIndex + 1].id;
 
   return (
-    <div className="bg-neutral-950 sm:rounded-md p-4 px-7 flex justify-between items-center">
+    <div className="panel flex justify-between items-center">
       <Link
         href={`/novel/${novel.id}/${prevChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md fade " +
+          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
           (currentChapterIndex - 1 < 0 && "invisible")
         }
       >
@@ -156,7 +208,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
 
       <Link
         href={`/novel/${novel.id}`}
-        className="hover:bg-neutral-800 p-1 rounded-md fade"
+        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
       >
         <BiListUl title="Chapter List" size={24} />
       </Link>
@@ -164,7 +216,7 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
       <Link
         href={`/novel/${novel.id}/${nextChapter}`}
         className={
-          "hover:bg-neutral-800 p-1 rounded-md fade " +
+          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
           (currentChapterIndex + 1 >= novel.chapters.length && "invisible")
         }
       >
@@ -173,93 +225,3 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
     </div>
   );
 };
-
-const ChapterSettings = ({ setFontSize, setPadding }) => {
-  var savedFontSize = getSetting("fontSize", true, 2);
-  var savedPadding = getSetting("padding", true, 4);
-
-  return (
-    <Stack className="items-end" spacing="xl">
-      <div className="flex items-center">
-        <span>Font Size</span>
-        <Slider
-          className="mx-2"
-          w={300}
-          max={fontSizes.length - 1}
-          defaultValue={savedFontSize}
-          label={null}
-          marks={fontSizes}
-          onChange={(value) => {
-            setSetting("fontSize", value);
-            setFontSize(fontSizes[value].tailwind);
-          }}
-        />
-      </div>
-      <div className="flex items-center mb-3">
-        <span>Paragraph Spacing</span>
-        <NumberInput
-          className="mx-2"
-          w={300}
-          defaultValue={savedPadding}
-          min={0}
-          max={12}
-          placeholder="Default: 4"
-          onChange={(value) => {
-            setSetting("padding", value);
-            setPadding(`my-${value}`);
-          }}
-        />
-      </div>
-    </Stack>
-  );
-};
-
-const getSetting = (key: string, ready: boolean, defaultValue: any) => {
-  let storedValue;
-
-  if (ready) {
-    var settings = JSON.parse(localStorage.getItem("settings"));
-    if (settings == undefined) return defaultValue;
-
-    storedValue = settings[key];
-  }
-
-  if (storedValue == undefined || Number.isNaN(storedValue))
-    return defaultValue;
-
-  return storedValue;
-};
-
-const setSetting = (key: string, value: any) => {
-  var settings = JSON.parse(localStorage.getItem("settings"));
-  if (settings == undefined) settings = {};
-
-  settings[key] = value;
-  localStorage.setItem("settings", JSON.stringify(settings));
-};
-
-const fontSizes = [
-  { value: 0, label: 12, tailwind: "text-xs" },
-  { value: 1, label: 14, tailwind: "text-sm" },
-  { value: 2, label: 16, tailwind: "text-base" },
-  { value: 3, label: 18, tailwind: "text-lg" },
-  { value: 4, label: 20, tailwind: "text-xl" },
-  { value: 5, label: 24, tailwind: "text-2xl" },
-  { value: 6, label: 34, tailwind: "text-3xl" },
-  { value: 7, label: 36, tailwind: "text-4xl" },
-  { value: 8, label: 48, tailwind: "text-5xl" },
-];
-
-// === Tailwind Triggers ===
-// my-1
-// my-2
-// my-3
-// my-4
-// my-5
-// my-6
-// my-7
-// my-8
-// my-9
-// my-10
-// my-11
-// my-12

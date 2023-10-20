@@ -6,8 +6,10 @@ import {
   BiHomeAlt2,
   BiSearchAlt2,
   BiSolidGridAlt,
+  BiSolidHomeAlt2,
+  BiSolidSearchAlt2,
 } from "react-icons/bi";
-import { PiBooks, PiPushPin, PiPushPinFill } from "react-icons/pi";
+import { PiBooks, PiBooksFill, PiPushPin, PiPushPinFill } from "react-icons/pi";
 import { Novel } from "../types/Novel";
 
 interface Props {
@@ -20,7 +22,7 @@ export default function Navbar({ children }: Props) {
 
   return (
     <>
-      <div className="flex bg-neutral-950">
+      <div className="flex bg-zinc-950">
         <OpenMenuButton
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
@@ -62,9 +64,19 @@ const TopMenu = ({ menuOpen, className }) => {
 
 const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   const buttons = [
-    { text: "Home", icon: BiHomeAlt2, link: "/" },
-    { text: "Search", icon: BiSearchAlt2, link: "/search" },
-    { text: "Library", icon: PiBooks, link: "/library" },
+    { text: "Home", icon: BiHomeAlt2, iconActive: BiSolidHomeAlt2, link: "/" },
+    {
+      text: "Search",
+      icon: BiSearchAlt2,
+      iconActive: BiSolidSearchAlt2,
+      link: "/search",
+    },
+    {
+      text: "Library",
+      icon: PiBooks,
+      iconActive: PiBooksFill,
+      link: "/library",
+    },
   ];
 
   const [recentNovels, setRecentNovels] = useState<Novel[]>([]);
@@ -90,7 +102,7 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   return (
     <div
       className={
-        "sm:visible fixed top-0 z-30 bg-neutral-950 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
+        "sm:visible fixed top-0 z-30 bg-zinc-950 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
         (!menuOpen ? " collapse" : " overflow-y-auto min-w-[200px]") +
         (!pinned && !menuOpen ? " sm:collapse" : "")
       }
@@ -102,6 +114,7 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
               key={btn.text}
               text={btn.text}
               Icon={btn.icon}
+              IconActive={btn.iconActive}
               link={btn.link}
               showText={menuOpen}
               setMenuOpen={setMenuOpen}
@@ -137,8 +150,9 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
         }}
         title={(pinned ? "Unpin" : "Pin") + " Sidebar"}
         className={
-          "items-center w-fit hover:bg-neutral-800 text-neutral-600 p-1 rounded-md fade hidden sm:flex" +
-          (menuOpen || pinned ? "" : " collapse")
+          "items-center w-fit transparent-button-hover p-1 rounded-md hidden sm:flex" +
+          (menuOpen || pinned ? "" : " collapse") +
+          (pinned ? " text-lavender-600" : " text-zinc-600")
         }
       >
         {(pinned && <PiPushPinFill size={24} />) || <PiPushPin size={24} />}
@@ -151,7 +165,9 @@ const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
   return (
     <div
       className={
-        "p-1 hover:bg-neutral-800 rounded-md w-fit h-fit fade " + className
+        "p-1 transparent-button-hover rounded-md w-fit h-fit " +
+        className +
+        (menuOpen ? " text-lavender-600" : " text-zinc-400")
       }
     >
       {(menuOpen && (
@@ -161,7 +177,20 @@ const OpenMenuButton = ({ menuOpen, setMenuOpen, className = "" }) => {
   );
 };
 
-const MenuButton = ({ text, Icon, link, showText, setMenuOpen }) => {
+const MenuButton = ({
+  text,
+  Icon,
+  IconActive,
+  link,
+  showText,
+  setMenuOpen,
+}) => {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    setActive(location.pathname == link);
+  });
+
   return (
     <Link
       href={link}
@@ -169,9 +198,12 @@ const MenuButton = ({ text, Icon, link, showText, setMenuOpen }) => {
         setMenuOpen(false);
       }}
       title={text}
-      className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade"
+      className={
+        "flex items-center p-1 rounded-md transparent-button-hover" +
+        (active ? " text-lavender-600" : " text-zinc-400")
+      }
     >
-      <Icon size={24} />
+      {(active && <IconActive size={24} />) || <Icon size={24} />}
       {showText && (
         <span className="mx-1 -my-1 font-semibold text-lg align-middle">
           {text}
@@ -191,10 +223,10 @@ const NovelButton = ({ image, title, id, setMenuOpen }) => {
         setMenuOpen(false);
       }}
       title={title}
-      className="flex items-center hover:bg-neutral-800 p-1 rounded-md fade space-x-2"
+      className="flex items-center group transparent-button-hover p-1 rounded-md space-x-2"
     >
       <Image
-        className="border border-neutral-800 rounded-md"
+        className="border border-transparent group-hover:border-lavender-600 fade rounded-md"
         radius={6}
         width={34}
         height={49}

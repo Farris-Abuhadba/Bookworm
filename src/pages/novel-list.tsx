@@ -1,10 +1,10 @@
 import { Title } from "@mantine/core";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useQuery } from "react-query";
 import LoadingScreen from "../components/LoadingScreen";
 import NovelCard from "../components/NovelCard";
 import { Novel } from "../types/Novel";
-import { useQuery } from "react-query";
 
 export default function NovelList() {
   useEffect(() => {
@@ -36,8 +36,11 @@ export default function NovelList() {
   const novelsArray = novels as Novel[];
 
   return (
-    <div className="sm:max-w-2/5 sm:w-3/5 sm:my-5 mx-auto p-4 rounded-md bg-neutral-800">
-      <Title className="mb-4 -m-4 p-4 rounded-t-md bg-neutral-950" size="38px">
+    <div className="panel">
+      <Title
+        className="mb-4 -m-4 p-4 sm:rounded-t-md bg-lavender-900 text-lavender-50 outline outline-1 outline-lavender-600"
+        size="38px"
+      >
         Featured
       </Title>
       <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5">

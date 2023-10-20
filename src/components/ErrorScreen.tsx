@@ -9,10 +9,10 @@ interface Props {
 
 const ErrorScreen = ({ title, children }: Props) => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen -mt-24 items-center justify-center">
       <Alert
         icon={<BiError size={32} />}
-        className="w-fit h-fit m-auto"
+        className="w-fit h-fit"
         title={title}
         color="red"
         variant="outline"

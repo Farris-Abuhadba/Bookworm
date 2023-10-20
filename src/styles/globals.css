@@ -2,8 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+.panel {
+  @apply bg-zinc-800 border border-zinc-600 mx-auto p-4 container sm:rounded-md sm:my-5;
+}
+
+.transparent-button-hover {
+  @apply fade bg-transparent group-hover:bg-lavender-950 hover:bg-lavender-950;
+}
+
 .fade {
-  @apply transition ease-in-out duration-300;
+  @apply transition-all fade-custom;
+}
+
+.fade-custom {
+  @apply ease-in-out duration-300;
 }
 
 ::-webkit-scrollbar {
