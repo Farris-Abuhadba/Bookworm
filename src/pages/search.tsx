@@ -29,6 +29,7 @@ const Search = () => {
   const totalPages = data?.nextPageNumber || 1;
 
   const handleSearch = () => {
+    if (searchValue.length < 3) return;
     setActivePage(1);
     setShowImages(true);
   };
@@ -38,54 +39,59 @@ const Search = () => {
   };
 
   return (
-    <div className="panel space-y-5">
+    <>
       <SearchBar
         searchValue={searchValue}
         setSearchValue={setSearchValue}
         handleSearch={handleSearch}
       />
-      <div>
-        {novels.map((novel, index) => {
-          const novelName = novel.link.split("/").pop();
-          return (
-            <div key={index}>
-              <Link href={`/novel/${novelName}`} className="flex items-center">
-                {showImages && (
-                  <>
-                    <Image
-                      className="m-2 w-fit rounded-md border border-neutral-800"
-                      width={200}
-                      height={89}
-                      src={novel.img}
-                      radius="md"
-                      withPlaceholder
-                    />
-                    <span className="text-xl">{novel.title}</span>
-                  </>
-                )}
-                {!showImages && (
-                  <span
-                    className={
-                      "p-2 rounded-md grow " +
-                      (index % 2 == 0 ? "bg-neutral-900" : "")
-                    }
-                  >
-                    {novel.title}
-                  </span>
-                )}
-              </Link>
-            </div>
-          );
-        })}
+      <div className="panel space-y-5">
+        <div>
+          {novels.map((novel, index) => {
+            const novelName = novel.link.split("/").pop();
+            return (
+              <div key={index}>
+                <Link
+                  href={`/novel/${novelName}`}
+                  className="flex items-center"
+                >
+                  {showImages && (
+                    <>
+                      <Image
+                        className="m-2 w-fit rounded-md border border-neutral-800"
+                        width={200}
+                        height={89}
+                        src={novel.img}
+                        radius="md"
+                        withPlaceholder
+                      />
+                      <span className="text-xl">{novel.title}</span>
+                    </>
+                  )}
+                  {!showImages && (
+                    <span
+                      className={
+                        "p-2 rounded-md grow " +
+                        (index % 2 == 0 ? "bg-neutral-900" : "")
+                      }
+                    >
+                      {novel.title}
+                    </span>
+                  )}
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+        {showImages && (
+          <Pagination
+            value={activePage}
+            onChange={handlePageChange}
+            total={totalPages}
+          />
+        )}
       </div>
-      {showImages && (
-        <Pagination
-          value={activePage}
-          onChange={handlePageChange}
-          total={totalPages}
-        />
-      )}
-    </div>
+    </>
   );
 };
 

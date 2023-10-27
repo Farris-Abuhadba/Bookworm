@@ -1,5 +1,5 @@
 import { TextInput } from "@mantine/core";
-import { BiSearchAlt2 } from "react-icons/bi";
+import { BiSearchAlt2, BiSolidSearchAlt2 } from "react-icons/bi";
 
 interface SearchBarProps {
   searchValue: string;
@@ -28,14 +28,16 @@ const SearchBar = ({
       <div
         title="Search"
         className={
-          "w-[36px] h-[36px] flex justify-center items-center sm:rounded-e-md border-s border-zinc-600 fade" +
+          "w-[36px] h-[36px] flex justify-center items-center border-zinc-600 fade" +
           (searchValue.length > 2
-            ? " text-zinc-400 hover:text-lavender-600 transparent-button-hover cursor-pointer"
+            ? " text-zinc-400 hover:text-lavender-600 fade cursor-pointer"
             : " text-zinc-600")
         }
         onClick={handleSearch}
       >
-        <BiSearchAlt2 size={24} />
+        {(searchValue.length < 3 && <BiSearchAlt2 size={24} />) || (
+          <BiSolidSearchAlt2 size={24} />
+        )}
       </div>
     </div>
   );
