@@ -1,0 +1,19 @@
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-primary-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-300;
+}
+
+::-webkit-scrollbar-thumb:active {
+  @apply bg-primary-200;
+}

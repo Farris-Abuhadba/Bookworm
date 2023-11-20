@@ -9,8 +9,13 @@ export default class _Document extends Document {
   render() {
     return (
       <Html>
-        <Head />
-        <body className="bg-zinc-900 text-zinc-300">
+        <Head>
+          <link
+            href="https://fonts.googleapis.com/css?family=Poppins"
+            rel="stylesheet"
+          />
+        </Head>
+        <body className="bg-primary-600 text-secondary-400 font-sans">
           <Main />
           <NextScript />
         </body>

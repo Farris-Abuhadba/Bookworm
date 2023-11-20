@@ -1,12 +1,4 @@
-import {
-  Button,
-  Divider,
-  Group,
-  Image,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Button, Divider, Group, Image, Stack, Title } from "@mantine/core";
 import { ReactNode, useEffect, useState } from "react";
 import {
   BiSolidBook,
@@ -40,14 +32,14 @@ const NovelPanel = ({ novel }: Props) => {
         <Image
           className="absolute blur-xl opacity-70"
           alt="Book Cover"
-          src={novel.cover}
+          src={novel.image}
           height={300}
           width={225}
         />
         <Image
           className="z-10"
           alt="Book Cover"
-          src={novel.cover}
+          src={novel.image}
           height={300}
           width={225}
           radius="md"

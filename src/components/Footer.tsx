@@ -1,14 +1,5 @@
-import { Footer } from "@mantine/core";
 import Link from "next/link";
-import {
-  BiEnvelope,
-  BiLogoDiscordAlt,
-  BiLogoFacebook,
-  BiLogoInstagram,
-  BiLogoReddit,
-  BiLogoTiktok,
-  BiLogoTwitter,
-} from "react-icons/bi";
+import { BiEnvelope } from "react-icons/bi";
 import { IconType } from "react-icons/lib";
 import { Logo } from "./Navbar";
 
@@ -46,7 +37,7 @@ const OurFooter = () => {
   ];
 
   return (
-    <Footer height={1}>
+    <div className="h-[25px]">
       <div className="sm:ms-[56px] mx-2 my-2 flex relative items-center">
         <Logo className="absolute left-2" />
         <span className="text-center w-full invisible sm:visible">
@@ -65,7 +56,7 @@ const OurFooter = () => {
           })}
         </div>
       </div>
-    </Footer>
+    </div>
   );
 };
 

@@ -1,0 +1,15 @@
+.panel {
+  @apply mx-auto sm:px-14 py-8 container;
+}
+
+.transparent-button-hover {
+  @apply fade bg-transparent group-hover:bg-accent-400/20 hover:bg-accent-400/20;
+}
+
+.fade {
+  @apply transition-all fade-custom;
+}
+
+.fade-custom {
+  @apply ease-in-out duration-300;
+}

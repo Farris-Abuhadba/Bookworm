@@ -22,7 +22,7 @@ export default function Navbar({ children }: Props) {
 
   return (
     <>
-      <div className="flex bg-zinc-950">
+      <div className="flex bg-primary-800">
         <OpenMenuButton
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
@@ -102,7 +102,7 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
   return (
     <div
       className={
-        "sm:visible fixed top-0 z-30 bg-zinc-950 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
+        "sm:visible fixed top-0 z-30 bg-primary-800 p-2 h-screen w-full sm:w-fit sm:max-w-[300px] flex flex-col justify-between" +
         (!menuOpen ? " collapse" : " overflow-y-auto min-w-[200px]") +
         (!pinned && !menuOpen ? " sm:collapse" : "")
       }
@@ -131,7 +131,7 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
                   key={novel.id}
                   id={novel.id}
                   title={novel.title}
-                  image={novel.cover}
+                  image={novel.image}
                   setMenuOpen={setMenuOpen}
                 />
               );

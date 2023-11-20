@@ -1,25 +1,26 @@
 export interface Novel {
-    title: string;
-    id: string;
+  title: string;
+  id: string;
 
-    author?: string;
-    cover?: string;
+  author?: string;
+  image?: string;
 
-    chapter_count?: number;
-    views?: number;
-    rating?: number;
-    status?: "Completed" | "On Going" | "Dropped" | "Hiatus";
+  description?: string;
+  chapter_count?: number;
+  views?: number;
+  rating?: number;
+  status?: "Completed" | "On Going" | "Dropped" | "Hiatus";
 
-    genres?: string[];
+  genres?: string[];
 
-    chapters?: Chapter[];
+  chapters?: Chapter[];
 }
 
 export interface Chapter {
-    title: string;
-    id: string;
+  title: string;
+  id: string;
 
-    content?: string[];
+  content?: string[];
 
-    timestamp?: number;
+  timestamp?: number;
 }
