@@ -1,4 +1,13 @@
-import { Button, Divider, Group, Image, Stack, Title } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Group,
+  Image,
+  Pill,
+  Rating,
+  Stack,
+  Title,
+} from "@mantine/core";
 import { ReactNode, useEffect, useState } from "react";
 import {
   BiSolidBook,
@@ -27,15 +36,15 @@ const NovelPanel = ({ novel }: Props) => {
   }, [novel]);
 
   return (
-    <div className="sm:flex panel">
+    <div className="sm:flex">
       <div className="relative w-fit h-fit my-2 mx-auto sm:mx-2 rounded-md border border-zinc-700">
-        <Image
+        {/* <Image
           className="absolute blur-xl opacity-70"
           alt="Book Cover"
           src={novel.image}
           height={300}
           width={225}
-        />
+        /> */}
         <Image
           className="z-10"
           alt="Book Cover"
@@ -64,16 +73,24 @@ const NovelPanel = ({ novel }: Props) => {
             <BiSolidBook className="me-2" /> {novel.chapter_count}
           </NovelStat>
           <NovelStat title="Rating">
-            <RatingStars rating={novel.rating} /> {novel.rating}
+            <Rating
+              className="me-2"
+              value={novel.rating}
+              fractions={2}
+              emptySymbol={<BiStar />}
+              fullSymbol={<BiSolidStar />}
+              readOnly
+            />
+            {novel.rating}
           </NovelStat>
           <NovelStat title="Status">{novel.status}</NovelStat>
         </Group>
 
-        <Group my="1rem" spacing={1}>
+        <div className="flex my-4 space-x-1">
           {novel.genres.map((item) => (
-            <GenreTag key={item} genre={item} />
+            <Pill key={item}>{item}</Pill>
           ))}
-        </Group>
+        </div>
 
         <Button
           className="me-2 fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
@@ -142,60 +159,3 @@ const NovelStat = ({ title, children }: NovelStatProps) => {
     </>
   );
 };
-
-interface GenreTagProps {
-  genre: string;
-}
-
-const GenreTag = ({ genre }: GenreTagProps) => {
-  return (
-    <Button
-      className="me-1 rounded-full fade-custom transition-colors text-lavender-600 bg-lavender-900/25 hover:bg-lavender-600/25 hover:border-lavender-600"
-      compact
-    >
-      {genre}
-    </Button>
-  );
-};
-
-interface RatingStarsProps {
-  rating: number;
-}
-
-const RatingStars = ({ rating }: RatingStarsProps) => {
-  let filledStars = [];
-  for (let i = 0; i < Math.floor(rating); i++) {
-    filledStars.push(0);
-  }
-
-  let emptyStars = [];
-  for (let i = Math.round(rating); i < 5; i++) {
-    emptyStars.push(0);
-  }
-
-  return (
-    <div className="flex me-2">
-      {filledStars.map((_item, index) => {
-        return (
-          <BiSolidStar key={"filledStar" + index} className="text-amber-500" />
-        );
-      })}
-      {Math.round(rating) > Math.floor(rating) && (
-        <BiSolidStarHalf className="text-amber-500" />
-      )}
-      {emptyStars.map((_item, index) => {
-        return <BiStar key={"emptyStar" + index} />;
-      })}
-    </div>
-  );
-};
-
-function viewsToString(views: number) {
-  const L = ["B", "M", "K"];
-  let l = 0;
-  for (let i = 1000000000; i >= 1000; i /= 1000) {
-    if (views >= i) return Math.round(views / (i / 10)) / 10 + L[l];
-    l++;
-  }
-  return views;
-}

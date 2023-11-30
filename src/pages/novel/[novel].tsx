@@ -1,4 +1,5 @@
 import RelativeTime from "@yaireo/relative-time";
+import { BackgroundImage, Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { BiSolidFile } from "react-icons/bi";
@@ -21,9 +22,22 @@ export default function NovelPage() {
 
   return (
     <>
-      <NovelPanel novel={novel} />
-      <LatestChapter chapter={novel.chapters[novel.chapters.length - 1]} />
-      <ChapterList chapters={novel.chapters} />
+      <div className="-z-10 fixed top-0 left-0 w-screen h-[480px] overflow-hidden">
+        <Image
+          className="saturate-50 opacity-25 blur-md"
+          h={480}
+          src={novel.image}
+          fallbackSrc="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a"
+        />
+      </div>
+      <div className="sticky top-0 h-0 mt-[400px] -z-10">
+        <div className="bg-primary-600 h-[480px]" />
+      </div>
+      <div className="panel space-y-8 -mt-[400px]">
+        <NovelPanel novel={novel} />
+        <LatestChapter chapter={novel.chapters[novel.chapters.length - 1]} />
+        <ChapterList chapters={novel.chapters} />
+      </div>
     </>
   );
 }
