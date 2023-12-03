@@ -37,7 +37,7 @@ const OurFooter = () => {
   ];
 
   return (
-    <div className="h-[25px]">
+    <div className="h-[25px] border-t border-secondary-700">
       <div className="sm:ms-[56px] mx-2 my-2 flex relative items-center">
         <Logo className="absolute left-2" />
         <span className="text-center w-full invisible sm:visible">
