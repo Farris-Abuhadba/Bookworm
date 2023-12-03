@@ -17,7 +17,10 @@ export const NovelCard = ({ novel }: Props) => {
           src={novel.image}
         />
       </div>
-      <span className="line-clamp-2 group-hover:text-accent-300 fade">
+      <span
+        title={novel.title}
+        className="line-clamp-2 group-hover:text-accent-300 fade"
+      >
         {novel.title}
       </span>
     </Link>
