@@ -36,93 +36,75 @@ const NovelPanel = ({ novel }: Props) => {
   }, [novel]);
 
   return (
-    <div className="sm:flex">
-      <div className="relative w-fit h-fit my-2 mx-auto sm:mx-2 rounded-md border border-zinc-700">
-        {/* <Image
-          className="absolute blur-xl opacity-70"
-          alt="Book Cover"
-          src={novel.image}
-          height={300}
-          width={225}
-        /> */}
-        <Image
-          className="z-10"
-          alt="Book Cover"
-          src={novel.image}
-          height={300}
-          width={225}
-          radius="md"
-          withPlaceholder
-        />
+    <div className="sm:flex space-x-4">
+      <div className="relative shrink-0 w-fit h-fit mx-auto sm:mx-0 rounded overflow-clip">
+        <Image w={288} h={405} src={novel.image} />
       </div>
-      <div className="m-2">
-        <Title
-          size="38px"
-          className="line-clamp-2 text-center sm:text-left"
+      <div className="flex flex-col justify-between my-4">
+        <h1
+          className="text-4xl line-clamp-5 lg:text-6xl lg:line-clamp-3 font-bold text-center sm:text-left"
           title={novel.title}
         >
           {novel.title}
-        </Title>
-        <div className="flex space-x-2">
-          <span className="shrink-0">By </span>
-          <span className="text-lavender-600 line-clamp-1">{novel.author}</span>
+        </h1>
+
+        <div className="space-y-2">
+          <div className="flex justify-center sm:justify-start">
+            <span className="shrink-0">By&nbsp;</span>
+            <span className="text-accent-300 line-clamp-1" title={novel.author}>
+              {novel.author}
+            </span>
+          </div>
+
+          <div className="flex justify-evenly sm:justify-start sm:space-x-4">
+            <NovelStat title="Chapters">
+              <BiSolidBook />
+              &nbsp;{novel.chapter_count}
+            </NovelStat>
+            <NovelStat title="Rating">
+              <Rating
+                value={novel.rating}
+                fractions={2}
+                emptySymbol={<BiStar />}
+                fullSymbol={<BiSolidStar />}
+                readOnly
+              />
+              &nbsp;
+              {novel.rating}
+            </NovelStat>
+            <NovelStat title="Status">{novel.status}</NovelStat>
+          </div>
+
+          <div className="flex flex-wrap justify-center sm:justify-start gap-1">
+            {novel.genres.map((item) => (
+              <Pill key={item}>{item}</Pill>
+            ))}
+          </div>
+
+          <div className="flex justify-center sm:justify-start space-x-2">
+            <Button
+              className="h-16 w-2/3 sm:w-[auto] sm:h-9"
+              onClick={() => {
+                location.href += "/" + lastRead;
+              }}
+            >
+              Read
+            </Button>
+
+            <Button
+              className="h-16 w-1/3 sm:w-[auto] sm:h-9"
+              variant="default"
+              onClick={() => {
+                if (inLibrary) removeFromLibrary(novel.id);
+                else addToLibrary(novel.id);
+
+                setInLibrary(isInLibrary(novel.id));
+              }}
+            >
+              {inLibrary ? "Add to Library" : "Remove from Library"}
+            </Button>
+          </div>
         </div>
-
-        <Group my="1rem" spacing="md">
-          <NovelStat title="Chapters">
-            <BiSolidBook className="me-2" /> {novel.chapter_count}
-          </NovelStat>
-          <NovelStat title="Rating">
-            <Rating
-              className="me-2"
-              value={novel.rating}
-              fractions={2}
-              emptySymbol={<BiStar />}
-              fullSymbol={<BiSolidStar />}
-              readOnly
-            />
-            {novel.rating}
-          </NovelStat>
-          <NovelStat title="Status">{novel.status}</NovelStat>
-        </Group>
-
-        <div className="flex my-4 space-x-1">
-          {novel.genres.map((item) => (
-            <Pill key={item}>{item}</Pill>
-          ))}
-        </div>
-
-        <Button
-          className="me-2 fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
-          onClick={() => {
-            location.href += "/" + lastRead;
-          }}
-        >
-          Read
-        </Button>
-
-        {(inLibrary && (
-          <Button
-            variant="outline"
-            className="hover:bg-zinc-400/25 border border-zinc-400 text-zinc-400 fade-custom transition-colors"
-            onClick={() => {
-              removeFromLibrary(novel.id);
-              setInLibrary(isInLibrary(novel.id));
-            }}
-          >
-            Remove from Library
-          </Button>
-        )) || (
-          <Button
-            className="hover:bg-lavender-600/25 border border-lavender-600 text-lavender-600 fade-custom transition-colors"
-            onClick={() => {
-              addToLibrary(novel.id);
-              setInLibrary(isInLibrary(novel.id));
-            }}
-          >
-            Add to Library
-          </Button>
-        )}
       </div>
     </div>
   );
@@ -138,24 +120,21 @@ interface NovelStatProps {
 const NovelStat = ({ title, children }: NovelStatProps) => {
   var statusColor = "";
   if (title === "Status") {
-    if (children == "On Going") statusColor = "text-green-500";
-    else if (children == "Completed") statusColor = "text-sky-500";
-    else if (children == "Hiatus") statusColor = "text-yellow-500";
-    else if (children == "Dropped") statusColor = "text-red-500";
+    if (children == "On Going") statusColor = "text-green-400";
+    else if (children == "Completed") statusColor = "text-sky-400";
+    else if (children == "Hiatus") statusColor = "text-amber-400";
+    else if (children == "Dropped") statusColor = "text-red-400";
     else statusColor = "text-red-500";
   }
 
   return (
     <>
-      <Stack spacing="xs">
-        <small className="-mb-3">{title}</small>
+      <div className="flex flex-col -space-y-1">
+        <small>{title}</small>
         {(title === "Status" && (
           <h5 className={statusColor}>{children}</h5>
         )) || <h5 className="flex items-center">{children}</h5>}
-      </Stack>
-      {title !== "Status" && (
-        <Divider my="auto" h={32} orientation="vertical" />
-      )}
+      </div>
     </>
   );
 };

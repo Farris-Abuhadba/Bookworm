@@ -1,5 +1,5 @@
 import RelativeTime from "@yaireo/relative-time";
-import { BackgroundImage, Image } from "@mantine/core";
+import { BackgroundImage, Image, Tabs } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { BiSolidFile } from "react-icons/bi";
@@ -22,21 +22,53 @@ export default function NovelPage() {
 
   return (
     <>
-      <div className="-z-10 fixed top-0 left-0 w-screen h-[480px] overflow-hidden">
+      <div className="-z-20 fixed top-0 left-0 w-screen h-[480px] overflow-hidden">
         <Image
-          className="saturate-50 opacity-25 blur-md"
+          className="saturate-100x opacity-25 blur-md"
           h={480}
           src={novel.image}
-          fallbackSrc="https://images.unsplash.com/photo-1419242902214-272b3f66ee7a"
         />
       </div>
-      <div className="sticky top-0 h-0 mt-[400px] -z-10">
-        <div className="bg-primary-600 h-[480px]" />
+      <div className="sticky -top-1 h-0 mt-[400px] -z-10">
+        <div className="bg-primary-600 h-[484px] border-t border-accent-600/95" />
       </div>
-      <div className="panel space-y-8 -mt-[400px]">
+      <div className="panel flex flex-col space-y-8 -mt-[400px]">
         <NovelPanel novel={novel} />
-        <LatestChapter chapter={novel.chapters[novel.chapters.length - 1]} />
-        <ChapterList chapters={novel.chapters} />
+
+        <Tabs defaultValue="description">
+          <Tabs.List>
+            <Tabs.Tab value="description">Description</Tabs.Tab>
+            <Tabs.Tab value="chapters">Chapters</Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="description">
+            <p className="p-4 bg-primary-500 rounded-b">
+              The human Race is at war with the Vicious Dalki and when they
+              needed help more than ever, THEY started to come forward. Humans
+              who had hidden in the shadows for hundreds of years, people with
+              abilities. Some chose to share their knowledge to the rest of the
+              world in hopes of winning the war, while others kept their
+              abilities to themselves. Quinn had lost everything to the war, his
+              home, his family and the only thing he had inherited was a crummy
+              old book that he couldn't even open. But when the book had finally
+              opened, Quinn was granted a system and his whole life was turned
+              around. He completed quest after quest and became more powerful,
+              until one day the system gave him a quest he wasn't sure he could
+              complete. "It is time to feed!" "You must drink human blood within
+              24 hours" "Your HP will continue to decrease until the task has
+              been completed"
+            </p>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="chapters">
+            <div className="p-4 bg-primary-500 rounded-b space-y-8">
+              <LatestChapter
+                chapter={novel.chapters[novel.chapters.length - 1]}
+              />
+              <ChapterList chapters={novel.chapters} />
+            </div>
+          </Tabs.Panel>
+        </Tabs>
       </div>
     </>
   );
@@ -66,7 +98,7 @@ interface LatestChapterProps {
 
 const LatestChapter = ({ chapter }: LatestChapterProps) => {
   return (
-    <div className="flex flex-wrap sm:flex-nowrap justify-between panel">
+    <div className="flex flex-wrap sm:flex-nowrap justify-between">
       <span className="flex items-center shrink-0 text-zinc-400">
         <BiSolidFile className="me-2" />
         Lastest Chapter
