@@ -22,7 +22,7 @@ const API_HotNovels = async (req: NextApiRequest, res: NextApiResponse) => {
             .slice(-1) || "";
         const cover = imageElement.getAttribute("src") || "";
 
-        data.push({ title, id, cover });
+        data.push({ title, id, image: cover });
       }
     });
 
