@@ -4,28 +4,23 @@ import { JSDOM } from "jsdom";
 
 const API_HotNovels = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    const response = await fetch("https://novelusb.com/");
+    const response = await fetch("https://boxnovel.com/novel/?m_orderby=trending");
     const document = new JSDOM(await response.text()).window.document;
     const data: Novel[] = [];
-    const novelElements = document.querySelectorAll("#index-novel-hot .item");
+    const novelElements = document.querySelectorAll("div.page-item-detail.text");
     novelElements.forEach((element) => {
-      const titleElement = element.querySelector(".title h3");
-      const imageElement = element.querySelector(".item-img");
+      const as = element.querySelectorAll("a");
+      const titleElement = as[1];
+      const imageElement = as[0].querySelector("img");
 
       if (titleElement && imageElement) {
         const title = titleElement.textContent?.trim() || "";
-        const id =
-          element
-            .querySelector("a")
-            ?.getAttribute("href")
-            .split("/")
-            .slice(-1) || "";
-        const cover = imageElement.getAttribute("src") || "";
+        const id = title.toLowerCase().replaceAll(" ", "-")
+        const cover = imageElement.getAttribute("data-src") || "";
 
         data.push({ title, id, cover });
       }
     });
-
     res.status(200).json(data);
   } catch (error) {
     console.error("An error occurred:", error);

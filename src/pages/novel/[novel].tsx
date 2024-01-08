@@ -1,3 +1,4 @@
+import React from "react";
 import RelativeTime from "@yaireo/relative-time";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -7,17 +8,23 @@ import ChapterList from "../../components/ChapterList";
 import ErrorScreen from "../../components/ErrorScreen";
 import LoadingScreen from "../../components/LoadingScreen";
 import NovelPanel from "../../components/NovelPanel";
-import { Chapter } from "../../types/Novel";
+import { Chapter, Novel } from "../../types/Novel";
 
-export default function NovelPage() {
+const NovelPage = () => {
   const router = useRouter();
   const novelName = router.query.novel?.toString();
 
-  const { data: novel, isLoading } = GetNovelData(novelName);
-  if (isLoading || !novel) return <LoadingScreen />;
-  if (novel.error)
-    return <ErrorScreen title="API Error">Novel not found</ErrorScreen>;
-  sessionStorage.setItem(novel.id, JSON.stringify(novel));
+  const { data: novel, isLoading, error } = useQuery(["novel", novelName], async () => {
+    const response = await fetch(`/api/novel?id=${novelName}`);
+    const data = await response.json();
+    return data;
+  }, {
+    enabled: !!novelName,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) return <LoadingScreen />;
+  if (error || !novel) return <ErrorScreen title="API Error">Novel not found</ErrorScreen>;
 
   return (
     <>
@@ -26,38 +33,20 @@ export default function NovelPage() {
       <ChapterList chapters={novel.chapters} />
     </>
   );
-}
-
-export const GetNovelData = (novelId: string) => {
-  let cleanedNovelId;
-  if (novelId != undefined) {
-    cleanedNovelId = novelId.substring(0, novelId.lastIndexOf("-novel"));
-  }
-
-  return useQuery({
-    queryKey: ["novel", cleanedNovelId],
-    queryFn: async () => {
-      const response = await fetch(`/api/novel?id=${cleanedNovelId}`);
-      const data = await response.json();
-      return data;
-    },
-    enabled: !!novelId,
-    refetchOnWindowFocus: false,
-  });
 };
 
 interface LatestChapterProps {
   chapter: Chapter;
 }
 
-const LatestChapter = ({ chapter }: LatestChapterProps) => {
+const LatestChapter: React.FC<LatestChapterProps> = ({ chapter }) => {
   return (
     <div className="flex flex-wrap sm:flex-nowrap justify-between panel">
       <span className="flex items-center shrink-0 text-zinc-400">
         <BiSolidFile className="me-2" />
         Lastest Chapter
       </span>
-      <Link href={location.href + "/" + chapter.id} title={chapter.title}>
+      <Link href={`${location.href}/${chapter.id}`} title={chapter.title}>
         <span className="line-clamp-1 sm:text-center hover:text-lavender-600 fade">
           {chapter.title}
         </span>
@@ -68,3 +57,5 @@ const LatestChapter = ({ chapter }: LatestChapterProps) => {
     </div>
   );
 };
+
+export default NovelPage;
