@@ -4,7 +4,6 @@ import { Novel } from "../../types/Novel";
 
 const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
   const novelId = req.query.id;
-  console.log(req.query);
 
   try {
     const novelResponse = await fetch(

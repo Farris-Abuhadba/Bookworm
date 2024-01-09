@@ -29,11 +29,11 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
       const authorElements = novelDocument.querySelector("div.author-content a")?.textContent?.trim() || "";
 
       author = authorElements
-      // TALK TO TRISTAN ABOUT MULTIPLE AUTHORS
-      // const authors: string[] = [];
-      //   authorElements.forEach((authorElement) => {
-      //   authors.push(authorElement.textContent?.trim() || "");
-      // });
+
+       const authors: string[] = [];
+         authorElements.forEach((authorElement) => {
+         authors.push(authorElement.textContent?.trim() || "");
+       });
 
       const genreElements = novelDocument.querySelectorAll("div.genres-content a");
       genreElements.forEach((genreElement) => {
