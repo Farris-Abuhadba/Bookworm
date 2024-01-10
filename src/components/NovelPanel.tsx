@@ -101,7 +101,7 @@ const NovelPanel = ({ novel }: Props) => {
                 setInLibrary(isInLibrary(novel.id));
               }}
             >
-              {inLibrary ? "Add to Library" : "Remove from Library"}
+              {inLibrary ? "Remove from Library" : "Add to Library"}
             </Button>
           </div>
         </div>

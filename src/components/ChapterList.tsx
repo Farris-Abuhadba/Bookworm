@@ -4,10 +4,10 @@ import { Button, Pagination, TextInput } from "@mantine/core";
 import { useState } from "react";
 import {
   BiLeftArrowAlt,
-  BiListUl,
   BiRightArrowAlt,
-  BiDotsHorizontalRounded,
   BiSearchAlt2,
+  BiArrowToLeft,
+  BiArrowToRight,
 } from "react-icons/bi";
 import { PiSortAscending, PiSortDescending } from "react-icons/pi";
 
@@ -15,7 +15,7 @@ interface Props {
   chapters: Chapter[];
 }
 
-const CHAPTERS_PER_PAGE = 15;
+const CHAPTERS_PER_PAGE = 50;
 const ChapterList = ({ chapters }: Props) => {
   const [page, setPage] = useState<number>(1);
   const [sortAscending, setSortAscending] = useState<boolean>(true);
@@ -31,7 +31,7 @@ const ChapterList = ({ chapters }: Props) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between space-x-4">
+      <div className="flex justify-between space-4 flex-wrap">
         <div className="flex space-x-2">
           <TextInput w={280} placeholder="Search Chapter Title or Number" />
           <Button className="w-9 h-9 p-0">
@@ -57,7 +57,10 @@ const ChapterList = ({ chapters }: Props) => {
             total={pages}
             previousIcon={BiLeftArrowAlt}
             nextIcon={BiRightArrowAlt}
-            dotsIcon={BiDotsHorizontalRounded}
+            firstIcon={BiArrowToLeft}
+            lastIcon={BiArrowToRight}
+            boundaries={0}
+            withEdges
           />
         </div>
       </div>

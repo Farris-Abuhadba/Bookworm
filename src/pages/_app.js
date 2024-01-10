@@ -8,6 +8,7 @@ import "../styles/components.css";
 import "../styles/globals.css";
 import "../styles/scrollbar.css";
 import "../styles/swiper.css";
+import "../styles/mantine.css";
 
 const queryClient = new QueryClient();
 
