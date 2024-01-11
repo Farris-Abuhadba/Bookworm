@@ -1,39 +1,69 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-.panel {
-  @apply bg-zinc-800 border border-zinc-600 mx-auto p-4 container sm:rounded-md sm:my-5;
+@layer {
+  @tailwind base;
 }
 
-.transparent-button-hover {
-  @apply fade bg-transparent group-hover:bg-lavender-950 hover:bg-lavender-950;
-}
+@layer base {
+  :root {
+    --color-primary-50: 193 194 197;
+    --color-primary-100: 166 167 171;
+    --color-primary-200: 144 146 150;
+    --color-primary-300: 92 95 102;
+    --color-primary-400: 55 58 64;
+    --color-primary-500: 44 46 51;
+    --color-primary-600: 37 38 43;
+    --color-primary-700: 26 27 30;
+    --color-primary-800: 20 21 23;
+    --color-primary-900: 16 17 19;
 
-.fade {
-  @apply transition-all fade-custom;
-}
+    --color-secondary-50: 248 249 250;
+    --color-secondary-100: 241 243 245;
+    --color-secondary-200: 233 236 239;
+    --color-secondary-300: 222 226 230;
+    --color-secondary-400: 206 212 218;
+    --color-secondary-500: 173 181 189;
+    --color-secondary-600: 134 142 150;
+    --color-secondary-700: 73 80 87;
+    --color-secondary-800: 52 58 64;
+    --color-secondary-900: 33 37 41;
 
-.fade-custom {
-  @apply ease-in-out duration-300;
-}
+    --color-accent-50: 246 233 255;
+    --color-accent-100: 230 207 255;
+    --color-accent-200: 200 156 255;
+    --color-accent-300: 169 100 255;
+    --color-accent-400: 143 55 254;
+    --color-accent-500: 126 25 254;
+    --color-accent-600: 118 9 255;
+    --color-accent-700: 100 0 228;
+    --color-accent-800: 89 0 204;
+    --color-accent-900: 76 0 179;
+  }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
+  /* .theme-sunset-pink {
+    --color-accent-50: "";
+    --color-accent-100: "";
+    --color-accent-200: "";
+    --color-accent-300: "";
+    --color-accent-400: "";
+    --color-accent-500: "";
+    --color-accent-600: "";
+    --color-accent-700: "";
+    --color-accent-800: "";
+    --color-accent-900: "";
+  }
 
-::-webkit-scrollbar-track {
-  background: #1a1b1e;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #ffffff38;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  border: 1px solid #ffffff50;
-}
-
-::-webkit-scrollbar-thumb:active {
-  border-color: #ffffffa4;
+  .theme-sunset-orange {
+    --color-accent-50: "";
+    --color-accent-100: "";
+    --color-accent-200: "";
+    --color-accent-300: "";
+    --color-accent-400: "";
+    --color-accent-500: "";
+    --color-accent-600: "";
+    --color-accent-700: "";
+    --color-accent-800: "";
+    --color-accent-900: "";
+  } */
 }

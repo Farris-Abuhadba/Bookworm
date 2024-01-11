@@ -18,7 +18,7 @@ const API_HotNovels = async (req: NextApiRequest, res: NextApiResponse) => {
         const id = title.toLowerCase().replaceAll(" ", "-")
         const cover = imageElement.getAttribute("data-src") || "";
 
-        data.push({ title, id, cover });
+        data.push({ title, id, image: cover });
       }
     });
     res.status(200).json(data);

@@ -150,7 +150,7 @@ const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
         <Image
           className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded-md border border-zinc-700"
           alt={novel.title}
-          src={novel.cover}
+          src={novel.image}
           height={100}
           width={75}
           radius="md"

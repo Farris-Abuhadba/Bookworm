@@ -1,0 +1,11 @@
+.swiper-pagination-bullet-active {
+  background-color: rgb(var(--color-accent-300)) !important;
+}
+
+.swiper-scrollbar {
+  @apply group-hover/swiper:!opacity-100 !duration-300 !bg-primary-900;
+}
+
+.swiper-scrollbar-drag {
+  background-color: rgb(var(--color-accent-300)) !important;
+}
