@@ -72,9 +72,9 @@ export default function ChapterContent() {
   const { data: chapterData, isLoading } = useQuery({
     queryKey: ["chapter", novel, currentChapter],
     queryFn: () =>
-      fetch(`/api/chapter?novelId=${novel}&chapterId=${currentChapter}`).then(
-        (response) => response.json()
-      ),
+      fetch(
+        `/api/boxNovelChapter?novelId=${novel}&chapterId=${currentChapter}`
+      ).then((response) => response.json()),
     enabled: router.isReady,
   });
 
@@ -154,7 +154,6 @@ const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
           height={100}
           width={75}
           radius="md"
-          withPlaceholder
         />
         <div className="m-5">
           <a

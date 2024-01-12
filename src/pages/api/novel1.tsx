@@ -72,7 +72,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
     const novel: Novel = {
       title: title,
       image: image,
-      id: novelId.toString() + "-novel",
+      id: novelId.toString(),
       chapter_count: chapters.length,
       author: author,
       genres: genres,
