@@ -31,7 +31,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
         else if (property.endsWith("update_time"))
           info["last_update"] = new Date(content).getTime();
       } else if (meta.getAttribute("itemprop") == "image")
-        info["cover"] = content;
+        info["image"] = content;
     });
 
     if (info["status"] == "OnGoing") info["status"] = "On Going";
@@ -62,7 +62,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const novel: Novel = {
       title: info["title"],
-      image: info["cover"],
+      image: info["image"],
       id: novelId.toString() + "-novel",
       chapter_count: chapters.length,
       author: info["author"],

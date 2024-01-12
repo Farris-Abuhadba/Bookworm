@@ -70,7 +70,7 @@ const NovelRow = ({ novelId, index }) => {
               radius={6}
               width={64}
               height={80}
-              src={novel.cover}
+              src={novel.image}
             />
           </div>
           <span className="line-clamp-3" title={novel.title}>

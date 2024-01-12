@@ -75,15 +75,10 @@ export default function NovelPage() {
 }
 
 export const GetNovelData = (novelId: string) => {
-  let cleanedNovelId;
-  if (novelId != undefined) {
-    cleanedNovelId = novelId.substring(0, novelId.lastIndexOf("-novel"));
-  }
-
   return useQuery({
-    queryKey: ["novel", cleanedNovelId],
+    queryKey: ["novel", novelId],
     queryFn: async () => {
-      const response = await fetch(`/api/novel?id=${cleanedNovelId}`);
+      const response = await fetch(`/api/novel1?id=${novelId}`);
       const data = await response.json();
       return data;
     },
@@ -109,7 +104,7 @@ const LatestChapter = ({ chapter }: LatestChapterProps) => {
         </span>
       </Link>
       <span className="text-zinc-500 shrink-0">
-        {new RelativeTime().from(new Date(chapter.timestamp))}
+        {new RelativeTime().from(new Date(chapter.timestamp * 1000))}
       </span>
     </div>
   );
