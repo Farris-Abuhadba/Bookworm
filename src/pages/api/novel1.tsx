@@ -55,7 +55,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
 
     var chapters: Chapter[] = [];
     var listItems = chaptersDocument.querySelectorAll("li.wp-manga-chapter");
-    listItems.forEach((item: HTMLElement) => {
+    listItems.forEach((item: HTMLElement, index) => {
       let link = item.querySelector("a");
       let chapterTitle = link.textContent?.trim() || "";
       let chapterId = link.href.split("/").slice(-2)[0] || "";
@@ -63,10 +63,15 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
       let timestamp = Math.floor(
         new Date(
           item.querySelector("span.chapter-release-date").textContent.trim()
-        ).valueOf() / 1000
+        ).valueOf() / 1000 || Date.now() / 1000 - 86400
       );
 
-      chapters.push({ title: chapterTitle, id: chapterId, timestamp });
+      chapters.push({
+        title: chapterTitle,
+        id: chapterId,
+        timestamp,
+        index: listItems.length - index,
+      });
     });
 
     const novel: Novel = {
