@@ -92,7 +92,7 @@ const NovelPanel = ({ novel }: Props) => {
             </Button>
 
             <Button
-              className="h-16 w-1/3 sm:w-[auto] sm:h-9"
+              className="h-16 sm:h-9"
               variant="default"
               onClick={() => {
                 if (inLibrary) removeFromLibrary(novel.id);
