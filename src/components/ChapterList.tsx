@@ -1,15 +1,18 @@
-import Link from "next/link";
-import { Chapter } from "../types/Novel";
 import { Button, Pagination, TextInput } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import RelativeTime from "@yaireo/relative-time";
+import Link from "next/link";
 import { useState } from "react";
 import {
+  BiArrowToLeft,
+  BiArrowToRight,
   BiLeftArrowAlt,
   BiRightArrowAlt,
   BiSearchAlt2,
-  BiArrowToLeft,
-  BiArrowToRight,
+  BiX,
 } from "react-icons/bi";
 import { PiSortAscending, PiSortDescending } from "react-icons/pi";
+import { Chapter } from "../types/Novel";
 
 interface Props {
   chapters: Chapter[];
@@ -19,57 +22,84 @@ const CHAPTERS_PER_PAGE = 50;
 const ChapterList = ({ chapters }: Props) => {
   const [page, setPage] = useState<number>(1);
   const [sortAscending, setSortAscending] = useState<boolean>(true);
+  const [search, setSearch] = useState<string>("");
+  const [debouncedSearch, cancelSearch] = useDebouncedValue(search, 1000);
 
-  let pages = chapters.length / CHAPTERS_PER_PAGE;
-  if (chapters.length % CHAPTERS_PER_PAGE > 0) pages++;
+  let visibleChapters = chapters.slice(0);
+  for (let i = 0; i < visibleChapters.length; i++) {
+    if (
+      search != "" &&
+      debouncedSearch != "" &&
+      !visibleChapters[i].title
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase())
+    ) {
+      visibleChapters.splice(i, 1);
+      i--;
+    }
+  }
 
-  if (!sortAscending) chapters = chapters.toReversed();
-  chapters = chapters.slice(
-    (page - 1) * CHAPTERS_PER_PAGE,
-    (page - 1) * CHAPTERS_PER_PAGE + CHAPTERS_PER_PAGE
+  let pages = visibleChapters.length / CHAPTERS_PER_PAGE;
+  if (visibleChapters.length % CHAPTERS_PER_PAGE > 0) pages++;
+
+  let visibleStartIndex = (page - 1) * CHAPTERS_PER_PAGE;
+  if (!sortAscending) visibleChapters = visibleChapters.toReversed();
+  visibleChapters = visibleChapters.slice(
+    visibleStartIndex,
+    visibleStartIndex + CHAPTERS_PER_PAGE
   );
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between space-4 flex-wrap">
-        <div className="flex space-x-2">
-          <TextInput w={280} placeholder="Search Chapter Title or Number" />
-          <Button className="w-9 h-9 p-0">
-            <BiSearchAlt2 />
-          </Button>
-        </div>
+      <div className="flex flex-wrap gap-2 justify-between items-center">
+        <TextInput
+          className="grow"
+          placeholder="Search chapters by title or number"
+          value={search}
+          onChange={(event) => {
+            setSearch(event.currentTarget.value);
+          }}
+          leftSection={<BiSearchAlt2 />}
+          rightSection={
+            search == "" || (
+              <BiX
+                onClick={() => {
+                  cancelSearch();
+                  setSearch("");
+                }}
+              />
+            )
+          }
+        />
 
-        <div className="flex space-x-4 items-center">
-          <Button
-            title={"Sort " + (sortAscending ? "Ascending" : "Descending")}
-            variant="default"
-            className="w-8 h-8 p-0"
-            onClick={() => {
-              setSortAscending(!sortAscending);
-              setPage(1);
-            }}
-          >
-            {(sortAscending && <PiSortAscending />) || <PiSortDescending />}
-          </Button>
-          <Pagination
-            value={page}
-            onChange={setPage}
-            total={pages}
-            previousIcon={BiLeftArrowAlt}
-            nextIcon={BiRightArrowAlt}
-            firstIcon={BiArrowToLeft}
-            lastIcon={BiArrowToRight}
-            boundaries={0}
-            withEdges
-          />
-        </div>
+        <Button
+          title={"Sort " + (sortAscending ? "Ascending" : "Descending")}
+          variant="default"
+          className="w-8 h-8 p-0 shrink-0"
+          onClick={() => {
+            setSortAscending(!sortAscending);
+            setPage(1);
+          }}
+        >
+          {(sortAscending && <PiSortAscending />) || <PiSortDescending />}
+        </Button>
+
+        <Pagination
+          value={page}
+          onChange={setPage}
+          total={pages}
+          previousIcon={BiLeftArrowAlt}
+          nextIcon={BiRightArrowAlt}
+          firstIcon={BiArrowToLeft}
+          lastIcon={BiArrowToRight}
+          boundaries={0}
+          gap={4}
+          withEdges
+        />
       </div>
-      <div
-        id="chapter-list"
-        className="space-y-1 border-t border-secondary-600"
-      >
-        {chapters.map((chapter, index) => (
-          <ChapterRow key={index} index={index + 1} chapter={chapter} />
+      <div id="chapter-list" className="grid grid-cols-1 md:grid-cols-2 gap-1">
+        {visibleChapters.map((chapter, index) => (
+          <ChapterRow key={index} chapter={chapter} />
         ))}
       </div>
     </div>
@@ -79,24 +109,34 @@ const ChapterList = ({ chapters }: Props) => {
 export default ChapterList;
 
 interface ChapterRowProps {
-  index: number;
   chapter: Chapter;
 }
 
-const ChapterRow = ({ index, chapter }: ChapterRowProps) => {
+const ChapterRow = ({ chapter }: ChapterRowProps) => {
+  let releaseDate = new Date(chapter.timestamp * 1000);
+
   return (
     <Link
       href={location.href + "/" + chapter.id}
-      className={
-        "group border border-transparent hover:border-lavender-600 p-1 rounded-md flex fade" +
-        (index % 2 == 0 ? " bg-zinc-900" : "")
-      }
-      title={chapter.title}
+      className="group bg-primary-600 hover:bg-primary-400 hover:scale-[1.01] rounded-sm p-1 fade"
     >
-      <span className="grow group-hover:text-lavender-600 truncate fade">
-        {chapter.title}
+      <div className="flex justify-between">
+        <span
+          className="group-hover:text-accent-300 truncate fade"
+          title={chapter.title}
+        >
+          {chapter.title}
+        </span>
+        <span className="font-bold ms-2 text-secondary-700">
+          {chapter.index}
+        </span>
+      </div>
+      <span
+        className="text-secondary-600"
+        title={`${releaseDate.toLocaleDateString()} ${releaseDate.toLocaleTimeString()}`}
+      >
+        {new RelativeTime().from(releaseDate)}
       </span>
-      <span className="font-bold ms-2 text-zinc-500">{index}</span>
     </Link>
   );
 };
