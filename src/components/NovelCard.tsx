@@ -37,8 +37,15 @@ export const NovelCardDetailed = ({ novel }: Props) => {
         <p className="group-hover:text-accent-300 line-clamp-2 text-secondary-200 fade">
           {novel.title}
         </p>
-        <p className="text-sm line-clamp-2 sm:line-clamp-3 text-secondary-500">
-          {novel.description}
+        <p
+          className={
+            "text-sm line-clamp-2 sm:line-clamp-3" +
+            (novel.description
+              ? " text-secondary-500"
+              : " text-secondary-600 italic")
+          }
+        >
+          {novel.description || "No description"}
         </p>
         <div className="space-x-1 space-y-1">
           {novel.genres?.map((genre, index) => {

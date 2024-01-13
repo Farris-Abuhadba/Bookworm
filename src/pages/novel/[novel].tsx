@@ -42,21 +42,13 @@ export default function NovelPage() {
           </Tabs.List>
 
           <Tabs.Panel value="description">
-            <p className="p-4 bg-primary-500 rounded-b">
-              The human Race is at war with the Vicious Dalki and when they
-              needed help more than ever, THEY started to come forward. Humans
-              who had hidden in the shadows for hundreds of years, people with
-              abilities. Some chose to share their knowledge to the rest of the
-              world in hopes of winning the war, while others kept their
-              abilities to themselves. Quinn had lost everything to the war, his
-              home, his family and the only thing he had inherited was a crummy
-              old book that he couldn't even open. But when the book had finally
-              opened, Quinn was granted a system and his whole life was turned
-              around. He completed quest after quest and became more powerful,
-              until one day the system gave him a quest he wasn't sure he could
-              complete. "It is time to feed!" "You must drink human blood within
-              24 hours" "Your HP will continue to decrease until the task has
-              been completed"
+            <p
+              className={
+                "p-4 bg-primary-500 rounded-b" +
+                (novel.description ? "" : " italic text-secondary-600")
+              }
+            >
+              {novel.description || "No description"}
             </p>
           </Tabs.Panel>
 
