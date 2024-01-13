@@ -84,19 +84,24 @@ interface LatestChapterProps {
 }
 
 const LatestChapter = ({ chapter }: LatestChapterProps) => {
+  let releaseDate = new Date(chapter.timestamp * 1000);
+
   return (
-    <div className="flex flex-wrap sm:flex-nowrap justify-between">
-      <span className="flex items-center shrink-0 text-zinc-400">
-        <BiSolidFile className="me-2" />
+    <div className="flex flex-wrap justify-between">
+      <span className="flex items-center shrink-0 gap-x-2 text-secondary-500">
+        <BiSolidFile />
         Lastest Chapter
       </span>
       <Link href={location.href + "/" + chapter.id} title={chapter.title}>
-        <span className="line-clamp-1 sm:text-center hover:text-lavender-600 fade">
+        <span className="line-clamp-1 hover:text-accent-300 fade">
           {chapter.title}
         </span>
       </Link>
-      <span className="text-zinc-500 shrink-0">
-        {new RelativeTime().from(new Date(chapter.timestamp * 1000))}
+      <span
+        className="text-secondary-600 shrink-0"
+        title={`${releaseDate.toLocaleDateString()} ${releaseDate.toLocaleTimeString()}`}
+      >
+        {new RelativeTime().from(releaseDate)}
       </span>
     </div>
   );
