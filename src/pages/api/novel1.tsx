@@ -17,14 +17,17 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
     var image = "";
     var author = "";
     var genres: string[] = [];
+    var summary = ""; 
 
     // DO THE SCRAPING SHIT
     const titleElement = novelDocument.querySelector("div.post-title h1");
     const imageElement = novelDocument.querySelector("div.summary_image img");
+    const summaryElement = novelDocument.querySelector("#editdescription");
 
     title = titleElement.textContent?.trim() || "";
     image = imageElement.getAttribute("data-src") || "";
-
+    summary = summaryElement.textContent || "";
+    
     const authorElements = novelDocument.querySelectorAll(
       "div.author-content a"
     );
@@ -83,6 +86,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
       genres: genres,
       rating: rating,
       status: status,
+      summary: summary,
       chapters: chapters.toReversed(),
     };
 

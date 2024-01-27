@@ -11,6 +11,8 @@ export interface Novel {
   rating?: number;
   status?: "Completed" | "On Going" | "Dropped" | "Hiatus";
 
+  summary?: string;
+
   genres?: string[];
 
   chapters?: Chapter[];
