@@ -1,6 +1,7 @@
 export interface Novel {
   title: string;
   id: string;
+  sourceIds: { [source: string]: string };
 
   author?: string;
   image?: string;
