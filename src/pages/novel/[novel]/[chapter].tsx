@@ -1,4 +1,4 @@
-import { Image } from "@mantine/core";
+import { ActionIcon, Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -22,8 +22,8 @@ export default function ChapterContent() {
     fontSize: {
       name: "Font Size",
       type: "number",
-      defaultValue: 16,
-      state: useState(16),
+      defaultValue: 18,
+      state: useState(18),
       min: 8,
       max: 72,
     },
@@ -58,8 +58,8 @@ export default function ChapterContent() {
     backgroundColor: {
       name: "Background Color",
       type: "color",
-      defaultValue: "#27272A",
-      state: useState("#27272A"),
+      defaultValue: "#25262B",
+      state: useState("#25262B"),
     },
   };
 
@@ -102,37 +102,51 @@ export default function ChapterContent() {
 
   return (
     <>
-      <ChapterHeader
-        novel={novelData}
-        chapter={chapterData}
-        settings={Object.keys(properties).map((key) => {
-          let property: Setting = properties[key];
-          property.id = key;
-
-          return property;
-        })}
+      <div
+        className="fixed top-0 w-screen h-screen -z-20 brightness-[50%]"
+        style={{
+          backgroundImage:
+            "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
+          backgroundAttachment: "repeat",
+        }}
       />
 
-      <div className="panel" style={{ backgroundColor }}>
-        {chapterData.content.map((text, index) => {
-          return (
-            <p
-              key={index}
-              style={{
-                margin:
-                  index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
-                fontSize: fontSize + "px",
-                lineHeight: lineHeight,
-                color: textColor,
-              }}
-            >
-              {text}
-            </p>
-          );
-        })}
-      </div>
+      <div
+        className="panel space-y-10 border-x-2 border-primary-400"
+        style={{ backgroundColor }}
+      >
+        <ChapterHeader
+          novel={novelData}
+          chapter={chapterData}
+          settings={Object.keys(properties).map((key) => {
+            let property: Setting = properties[key];
+            property.id = key;
 
-      <ChapterControls novel={novelData} chapter={chapterData} />
+            return property;
+          })}
+        />
+
+        <div>
+          {chapterData.content.map((text, index) => {
+            return (
+              <p
+                key={index}
+                style={{
+                  margin:
+                    index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
+                  fontSize: fontSize + "px",
+                  lineHeight: lineHeight,
+                  color: textColor,
+                }}
+              >
+                {text}
+              </p>
+            );
+          })}
+        </div>
+
+        <ChapterControls novel={novelData} chapter={chapterData} />
+      </div>
     </>
   );
 }
@@ -145,10 +159,10 @@ interface ChapterHeaderProps {
 
 const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
   return (
-    <div className="panel flex justify-between items-center text-xl">
+    <div className="flex justify-between items-center text-xl">
       <div className="flex">
         <Image
-          className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded-md border border-zinc-700"
+          className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
           alt={novel.title}
           src={novel.image}
           height={100}
@@ -157,7 +171,7 @@ const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
         />
         <div className="m-5">
           <a
-            className="text-2xl sm:leading-[2.75rem] sm:text-4xl font-bold line-clamp-1 hover:text-lavender-600 fade"
+            className="text-2xl sm:leading-[2.75rem] sm:text-4xl font-bold line-clamp-1 hover:text-accent-300 fade"
             href={"/novel/" + novel.id}
             title={novel.title}
           >
@@ -197,19 +211,17 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
     <div className="panel flex justify-between items-center">
       <Link
         href={`/novel/${novel.id}/${prevChapter}`}
-        className={
-          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
-          (currentChapterIndex - 1 < 0 && "invisible")
-        }
+        className={currentChapterIndex - 1 < 0 && "invisible"}
       >
-        <BiLeftArrowAlt title="Previous Chapter" size={24} />
+        <ActionIcon title="Previous Chapter">
+          <BiLeftArrowAlt size={24} />
+        </ActionIcon>
       </Link>
 
-      <Link
-        href={`/novel/${novel.id}`}
-        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
-      >
-        <BiListUl title="Chapter List" size={24} />
+      <Link href={`/novel/${novel.id}`}>
+        <ActionIcon title="Chapter List">
+          <BiListUl size={24} />
+        </ActionIcon>
       </Link>
 
       <Link

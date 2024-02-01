@@ -1,4 +1,10 @@
-import { Button, ColorInput, Modal, NumberInput } from "@mantine/core";
+import {
+  Button,
+  ColorInput,
+  Modal,
+  NumberInput,
+  ActionIcon,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { BiCog } from "react-icons/bi";
@@ -49,12 +55,9 @@ export const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
         <SettingsModal closeModal={close} properties={properties} />
       </Modal>
 
-      <div
-        className="p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600"
-        onClick={open}
-      >
-        <BiCog title="Settings" size={25} />
-      </div>
+      <ActionIcon variant="default" size="lg" title="Settings" onClick={open}>
+        <BiCog size={25} />
+      </ActionIcon>
     </>
   );
 };
@@ -153,7 +156,8 @@ const SettingInputNumber = ({ property, onChange }: SettingInputProps) => {
       <span>{p.name}</span>
       <NumberInput
         value={p.state[0]}
-        precision={p.precision || 0}
+        decimalScale={p.precision || 0}
+        fixedDecimalScale={true}
         step={p.step || 1}
         min={p.min || 0}
         max={p.max || 100}
