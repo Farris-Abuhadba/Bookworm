@@ -1,8 +1,14 @@
-import { ActionIcon, Image } from "@mantine/core";
+import { ActionIcon, Button, Image } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { BiLeftArrowAlt, BiListUl, BiRightArrowAlt } from "react-icons/bi";
+import {
+  BiLeftArrowAlt,
+  BiListUl,
+  BiMenu,
+  BiRightArrowAlt,
+  BiSidebar,
+} from "react-icons/bi";
 import { useQuery } from "react-query";
 import {
   ChapterSettings,
@@ -105,47 +111,58 @@ export default function ChapterContent() {
       <div
         className="fixed top-0 w-screen h-screen -z-20 brightness-[50%]"
         style={{
-          backgroundImage:
-            "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
+          // backgroundImage:
+          //   "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
+          backgroundImage: "url(https://source.unsplash.com/random/1920x1080)",
           backgroundAttachment: "repeat",
         }}
       />
 
-      <div
-        className="panel space-y-10 border-x-2 border-primary-400"
-        style={{ backgroundColor }}
-      >
-        <ChapterHeader
-          novel={novelData}
-          chapter={chapterData}
-          settings={Object.keys(properties).map((key) => {
-            let property: Setting = properties[key];
-            property.id = key;
+      <div className="flex">
+        <div
+          className="panel space-y-10 border-x-2 border-primary-400"
+          style={{ backgroundColor }}
+        >
+          <ChapterHeader
+            novel={novelData}
+            chapter={chapterData}
+            settings={Object.keys(properties).map((key) => {
+              let property: Setting = properties[key];
+              property.id = key;
 
-            return property;
-          })}
-        />
+              return property;
+            })}
+          />
 
-        <div>
-          {chapterData.content.map((text, index) => {
-            return (
-              <p
-                key={index}
-                style={{
-                  margin:
-                    index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
-                  fontSize: fontSize + "px",
-                  lineHeight: lineHeight,
-                  color: textColor,
-                }}
-              >
-                {text}
-              </p>
-            );
-          })}
+          <ChapterControls novel={novelData} chapter={chapterData} />
+
+          <div>
+            {chapterData.content.map((text, index) => {
+              return (
+                <p
+                  key={index}
+                  style={{
+                    margin:
+                      index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
+                    fontSize: fontSize + "px",
+                    lineHeight: lineHeight,
+                    color: textColor,
+                  }}
+                >
+                  {text}
+                </p>
+              );
+            })}
+          </div>
+
+          <ChapterControls novel={novelData} chapter={chapterData} />
         </div>
 
-        <ChapterControls novel={novelData} chapter={chapterData} />
+        <div className="sticky top-0 p-1 h-screen">
+          <ActionIcon variant="default" size="lg">
+            <BiSidebar size={24} />
+          </ActionIcon>
+        </div>
       </div>
     </>
   );
@@ -213,15 +230,17 @@ const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
         href={`/novel/${novel.id}/${prevChapter}`}
         className={currentChapterIndex - 1 < 0 && "invisible"}
       >
-        <ActionIcon title="Previous Chapter">
+        <Button title="Previous Chapter">
           <BiLeftArrowAlt size={24} />
-        </ActionIcon>
+          Back
+        </Button>
       </Link>
 
       <Link href={`/novel/${novel.id}`}>
-        <ActionIcon title="Chapter List">
+        <Button title="Chapter List">
           <BiListUl size={24} />
-        </ActionIcon>
+          Chapters
+        </Button>
       </Link>
 
       <Link
