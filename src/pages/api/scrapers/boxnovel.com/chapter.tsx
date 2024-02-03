@@ -2,8 +2,9 @@ import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Chapter } from "../../../../types/Novel";
 
-const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
+const BOXNOVEL_API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
   const { novelId, chapterId } = req.query;
+
   console.log(req.query);
 
   if (novelId == undefined || chapterId == undefined) {
@@ -11,35 +12,42 @@ const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
+
   try {
+    const tempTitle: string = `${chapterId}`
+    const parts: string[] = tempTitle.split('-')
+    const result: string = parts.slice(0,2).join('-')
+    const cleanChapterID = result;
+
     const response = await fetch(
-      `https://novelusb.com/novel-book/${novelId}/${chapterId}`
+      `https://boxnovel.com/novel/${novelId}-boxnovel/${cleanChapterID}`
     );
     const document = new JSDOM(await response.text()).window.document;
-
-    var title = document.querySelector("a.chr-title").textContent;
-
-    var watermark: String = document.querySelector(
-      ".comments > script:nth-child(2)"
-    ).textContent;
-    watermark = watermark.substring(
-      watermark.indexOf('replace("') + 9,
-      watermark.indexOf('", "")')
-    );
+    const title = chapterId.toString();
+    
+    // var watermark: String = document.querySelector(
+    //   ".comments > script:nth-child(2)"
+    // ).textContent;
+    // watermark = watermark.substring(
+    //   watermark.indexOf('replace("') + 9,
+    //   watermark.indexOf('", "")')
+    // );
 
     var content = [];
-    var ps = document.querySelectorAll("#chr-content p");
+    var ps = document.querySelectorAll("div.text-left p");
     ps.forEach((p) => {
       if (p && p.textContent != "")
-        content.push(p.textContent.replace(watermark, ""));
+        content.push(p.textContent);
     });
+
+
 
     const chapter: Chapter = {
       title,
       id: chapterId.toString(),
       content,
     };
-
+    
     res.status(200).json(chapter);
   } catch (error) {
     console.error("An error occurred:", error);
@@ -49,4 +57,4 @@ const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default API_Chapter;
+export default BOXNOVEL_API_Chapter;

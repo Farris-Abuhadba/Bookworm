@@ -70,6 +70,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
       rating,
       status: info["status"],
       chapters,
+      sourceIds: {}
     };
 
     res.status(200).json(novel);
