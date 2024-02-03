@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Novel } from "../../types/Novel";
+import { Novel } from "../../../../types/Novel";
 import { JSDOM } from "jsdom";
 
 const API_HotNovels = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -22,7 +22,10 @@ const API_HotNovels = async (req: NextApiRequest, res: NextApiResponse) => {
         const id = title.toLowerCase().replaceAll(" ", "-");
         const image = imageElement.getAttribute("data-src") || "";
 
-        data.push({ title, id, image });
+        data.push({
+          title, id, image,
+          sourceIds: {}
+        });
       }
     });
     res.status(200).json(data);

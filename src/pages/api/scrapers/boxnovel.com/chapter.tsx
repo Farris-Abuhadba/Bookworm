@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
-import { Chapter } from "../../types/Novel";
+import { Chapter } from "../../../../types/Novel";
 
 const API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
   const { novelId, chapterId } = req.query;

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { Novel, Chapter } from "../../types/Novel";
+import { Novel, Chapter } from "../../../../types/Novel";
 import { JSDOM } from "jsdom";
 
 const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -87,6 +87,7 @@ const API_Novel = async (req: NextApiRequest, res: NextApiResponse) => {
       status: status,
       description: description,
       chapters: chapters.toReversed(),
+      sourceIds: {}
     };
 
     res.status(200).json(novel);
