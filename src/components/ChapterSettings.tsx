@@ -56,7 +56,7 @@ export const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
       </Modal>
 
       <ActionIcon variant="default" size="lg" title="Settings" onClick={open}>
-        <BiCog size={25} />
+        <BiCog size={24} />
       </ActionIcon>
     </>
   );

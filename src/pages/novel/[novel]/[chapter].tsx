@@ -1,20 +1,14 @@
-import { ActionIcon, Button, Image } from "@mantine/core";
-import Link from "next/link";
+import { Image } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import {
-  BiLeftArrowAlt,
-  BiListUl,
-  BiMenu,
-  BiRightArrowAlt,
-  BiSidebar,
-} from "react-icons/bi";
 import { useQuery } from "react-query";
+import ChapterControls from "../../../components/ChapterControls";
 import {
   ChapterSettings,
   Setting,
   getSetting,
 } from "../../../components/ChapterSettings";
+import ChapterSidebar from "../../../components/ChapterSidebar";
 import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
@@ -75,6 +69,8 @@ export default function ChapterContent() {
   const textColor = properties.textColor.state[0];
   const backgroundColor = properties.backgroundColor.state[0];
 
+  const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
   const { data: chapterData, isLoading } = useQuery({
     queryKey: ["chapter", novel, currentChapter],
     queryFn: () =>
@@ -100,7 +96,7 @@ export default function ChapterContent() {
   lastReadChapters[novel.toString()] = currentChapter;
   localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
 
-  const novelData = JSON.parse(sessionStorage.getItem(novel.toString()));
+  const novelData: Novel = JSON.parse(sessionStorage.getItem(novel.toString()));
   if (!novelData) location.href = "/novel/" + novel;
 
   if (chapterData.error != undefined)
@@ -111,30 +107,33 @@ export default function ChapterContent() {
       <div
         className="fixed top-0 w-screen h-screen -z-20 brightness-[50%]"
         style={{
-          // backgroundImage:
-          //   "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
-          backgroundImage: "url(https://source.unsplash.com/random/1920x1080)",
+          backgroundImage:
+            "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
+          // backgroundImage: "url(https://source.unsplash.com/random/1920x1080)",
           backgroundAttachment: "repeat",
         }}
       />
 
-      <div className="flex">
+      <div
+        className="grid w-full h-full m-0 p-0 overflow-x-clip"
+        style={{ gridTemplateColumns: "auto min-content min-content" }}
+      >
         <div
-          className="panel space-y-10 border-x-2 border-primary-400"
+          className="flex flex-col panel space-y-10 border-x-2 border-primary-400"
           style={{ backgroundColor }}
         >
-          <ChapterHeader
-            novel={novelData}
-            chapter={chapterData}
-            settings={Object.keys(properties).map((key) => {
-              let property: Setting = properties[key];
-              property.id = key;
+          {true && (
+            <ChapterHeader
+              novel={novelData}
+              chapter={chapterData}
+              settings={Object.keys(properties).map((key) => {
+                let property: Setting = properties[key];
+                property.id = key;
 
-              return property;
-            })}
-          />
-
-          <ChapterControls novel={novelData} chapter={chapterData} />
+                return property;
+              })}
+            />
+          )}
 
           <div>
             {chapterData.content.map((text, index) => {
@@ -155,14 +154,20 @@ export default function ChapterContent() {
             })}
           </div>
 
-          <ChapterControls novel={novelData} chapter={chapterData} />
+          <ChapterControls
+            className="self-center"
+            novelId={novelData.id}
+            chapters={novelData.chapters}
+            current={chapterData}
+          />
         </div>
 
-        <div className="sticky top-0 p-1 h-screen">
-          <ActionIcon variant="default" size="lg">
-            <BiSidebar size={24} />
-          </ActionIcon>
-        </div>
+        <ChapterSidebar
+          novel={novelData}
+          chapter={chapterData}
+          isOpen={isSidebarOpen}
+          setOpen={setSidebarOpen}
+        />
       </div>
     </>
   );
@@ -194,64 +199,15 @@ const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
           >
             {novel.title}
           </a>
-          <p className="text-xl line-clamp-1" title={chapter.title}>
-            {chapter.title}
-          </p>
+          <ChapterControls
+            novelId={novel.id}
+            chapters={novel.chapters}
+            current={chapter}
+          />
         </div>
       </div>
 
       <ChapterSettings properties={settings} />
-    </div>
-  );
-};
-
-interface ChapterControlsProps {
-  novel: Novel;
-  chapter: Chapter;
-}
-
-const ChapterControls = ({ novel, chapter }: ChapterControlsProps) => {
-  var currentChapterIndex = 0;
-  novel.chapters.forEach((c, index) => {
-    if (c.id == chapter.id) {
-      currentChapterIndex = index;
-    }
-  });
-
-  const prevChapter =
-    currentChapterIndex - 1 >= 0 && novel.chapters[currentChapterIndex - 1].id;
-  const nextChapter =
-    currentChapterIndex + 1 < novel.chapters.length &&
-    novel.chapters[currentChapterIndex + 1].id;
-
-  return (
-    <div className="panel flex justify-between items-center">
-      <Link
-        href={`/novel/${novel.id}/${prevChapter}`}
-        className={currentChapterIndex - 1 < 0 && "invisible"}
-      >
-        <Button title="Previous Chapter">
-          <BiLeftArrowAlt size={24} />
-          Back
-        </Button>
-      </Link>
-
-      <Link href={`/novel/${novel.id}`}>
-        <Button title="Chapter List">
-          <BiListUl size={24} />
-          Chapters
-        </Button>
-      </Link>
-
-      <Link
-        href={`/novel/${novel.id}/${nextChapter}`}
-        className={
-          "p-1 rounded-md transparent-button-hover border border-transparent hover:border-lavender-600 " +
-          (currentChapterIndex + 1 >= novel.chapters.length && "invisible")
-        }
-      >
-        <BiRightArrowAlt title="Next Chapter" size={24} />
-      </Link>
     </div>
   );
 };
