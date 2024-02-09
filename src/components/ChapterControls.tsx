@@ -172,14 +172,13 @@ const ChapterDropdownSearch = ({
     >
       <Combobox.Target>
         <InputBase
-          w={320}
           component="button"
           type="button"
           pointer
           rightSection={<Combobox.Chevron />}
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents="none"
-          className="line-clamp-1"
+          className="line-clamp-1 w-full"
         >
           {value.title}
         </InputBase>
