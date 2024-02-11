@@ -23,7 +23,7 @@
         "next": "^13.5.6",
         "node-fetch": "^3.3.2",
         "node-html-parser": "^6.1.11",
-        "postcss": "8.4.27",
+        "postcss": "^8.4.35",
         "puppeteer": "^21.5.2",
         "puppeteer-extra": "^3.3.6",
         "puppeteer-extra-plugin-stealth": "^2.11.2",
