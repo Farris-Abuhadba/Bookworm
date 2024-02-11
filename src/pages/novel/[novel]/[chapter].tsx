@@ -6,17 +6,49 @@ import ChapterControls from "../../../components/ChapterControls";
 import {
   ChapterSettings,
   Setting,
+  SettingsGroup,
   getSetting,
 } from "../../../components/ChapterSettings";
 import ChapterSidebar from "../../../components/ChapterSidebar";
 import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Chapter, Novel } from "../../../types/Novel";
+import { BiFont } from "react-icons/bi";
 
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
+
+  const propertyGroups = [
+    {
+      name: "Font",
+      Icon: BiFont,
+      settings: [
+        {
+          name: "Font Family",
+          type: "select",
+          defaultValue: "Calibri",
+          options: ["Arial", "Calibri", "Times New Roman"],
+          state: useState("Calibri"),
+        },
+        {
+          name: "Font Size",
+          type: "number",
+          defaultValue: 18,
+          state: useState(18),
+          min: 8,
+          max: 72,
+        },
+        {
+          name: "Font Color",
+          type: "color",
+          defaultValue: "#CED4DA",
+          state: useState("#CED4DA"),
+        },
+      ],
+    },
+  ];
 
   const properties = {
     fontSize: {
@@ -122,18 +154,7 @@ export default function ChapterContent() {
           className="flex flex-col panel space-y-10 border-x-2 border-primary-400"
           style={{ backgroundColor }}
         >
-          {true && (
-            <ChapterHeader
-              novel={novelData}
-              chapter={chapterData}
-              settings={Object.keys(properties).map((key) => {
-                let property: Setting = properties[key];
-                property.id = key;
-
-                return property;
-              })}
-            />
-          )}
+          {true && <ChapterHeader novel={novelData} chapter={chapterData} />}
 
           <div>
             {chapterData.content.map((text, index) => {
@@ -165,6 +186,7 @@ export default function ChapterContent() {
         <ChapterSidebar
           novel={novelData}
           chapter={chapterData}
+          settingsGroups={propertyGroups as SettingsGroup[]}
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}
         />
@@ -176,10 +198,9 @@ export default function ChapterContent() {
 interface ChapterHeaderProps {
   novel: Novel;
   chapter: Chapter;
-  settings: Setting[];
 }
 
-const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
+const ChapterHeader = ({ novel, chapter }: ChapterHeaderProps) => {
   return (
     <div className="flex justify-between items-center text-xl">
       <div className="flex">
@@ -206,8 +227,6 @@ const ChapterHeader = ({ novel, chapter, settings }: ChapterHeaderProps) => {
           />
         </div>
       </div>
-
-      <ChapterSettings properties={settings} />
     </div>
   );
 };

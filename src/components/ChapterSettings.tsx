@@ -4,6 +4,7 @@ import {
   Modal,
   NumberInput,
   ActionIcon,
+  Select,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
@@ -11,12 +12,26 @@ import { BiCog } from "react-icons/bi";
 import { PiXBold } from "react-icons/pi";
 
 export interface Setting {
-  id: string;
   name: string;
-  type: "number" | "color";
+  type: "number" | "color" | "select";
 
   defaultValue: any;
   state: [any, (value: any) => void];
+}
+
+export interface SettingsGroup {
+  Icon: any;
+  name: string;
+  settings: Setting[];
+
+  open?: [boolean, (value: boolean) => void];
+}
+
+interface SelectSetting extends Setting {
+  defaultValue: string;
+  options: string[];
+
+  state: [string, (value: string) => void];
 }
 
 interface NumberSetting extends Setting {
@@ -36,37 +51,76 @@ interface ColorSetting extends Setting {
 }
 
 interface ChapterSettingsProps {
-  properties: Setting[];
+  groups: SettingsGroup[];
 }
 
-export const ChapterSettings = ({ properties }: ChapterSettingsProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
+export const ChapterSettings = ({ groups }: ChapterSettingsProps) => {
+  for (let i = 0; i < groups.length; i++) {
+    groups[i].open = useState<boolean>(false);
+  }
 
   return (
     <>
-      <Modal
-        opened={opened}
-        onClose={close}
-        padding={0}
-        radius={0}
-        centered
-        withCloseButton={false}
-      >
-        <SettingsModal closeModal={close} properties={properties} />
-      </Modal>
-
-      <ActionIcon variant="default" size="lg" title="Settings" onClick={open}>
-        <BiCog size={24} />
-      </ActionIcon>
+      {groups.map((group) => {
+        return (
+          <SettingsGroupButton
+            Icon={group.Icon}
+            name={group.name}
+            settings={group.settings}
+            open={group.open}
+          />
+        );
+      })}
     </>
   );
 };
 
-interface SettingsModalProps extends ChapterSettingsProps {
-  closeModal(): void;
+interface SettingsGroupButtonProps {
+  name: string;
+  Icon: any;
+  settings: Setting[];
+  open: [any, (value: any) => void];
 }
 
-const SettingsModal = ({ closeModal, properties }: SettingsModalProps) => {
+const SettingsGroupButton = ({
+  name,
+  Icon,
+  settings,
+  open,
+}: SettingsGroupButtonProps) => {
+  return (
+    <div
+      className={
+        "bg-primary-700 border-primary-400 rounded " +
+        (open[0] ? "border-x border-b" : "")
+      }
+    >
+      <Button
+        variant="default"
+        justify="space-between"
+        className="font-normal text-secondary-400"
+        fullWidth
+        rightSection={<Icon size={24} />}
+        onClick={() => {
+          open[1](!open[0]);
+        }}
+      >
+        {name}
+      </Button>
+
+      <div className={"p-2 space-y-1 " + (open[0] ? "" : "hidden")}>
+        <Select
+          label="Font Family"
+          data={["Arial", "Calibri", "Times New Roman", "Roboto"]}
+        />
+        <NumberInput label="Font Size" />
+        <ColorInput label="Font Color" />
+      </div>
+    </div>
+  );
+};
+
+const SettingsModal = ({ closeModal, properties }) => {
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   function updateValue(state, newValue) {
@@ -128,7 +182,10 @@ const SettingsModal = ({ closeModal, properties }: SettingsModalProps) => {
           className="me-2 fade-custom transition-colors bg-lavender-600 hover:bg-lavender-700"
           onClick={() => {
             properties.forEach((property) => {
-              setSetting(property.id, property.state[0]);
+              setSetting(
+                property.name.toLowerCase().replaceAll(" ", ""),
+                property.state[0]
+              );
             });
             setUnsavedChanges(false);
           }}
