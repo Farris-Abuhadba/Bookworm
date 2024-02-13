@@ -1,46 +1,24 @@
+import { ActionIcon, Button, Divider, Image, Progress } from "@mantine/core";
+import Link from "next/link";
+import { ReactNode, useEffect, useState } from "react";
 import {
-  ActionIcon,
-  Button,
-  ColorInput,
-  Divider,
-  Image,
-  NumberInput,
-  Progress,
-  Select,
-} from "@mantine/core";
-import {
-  BiBookAdd,
-  BiBookmark,
-  BiBookmarkAlt,
   BiBookmarkPlus,
   BiChat,
   BiFolderPlus,
-  BiFont,
-  BiFontColor,
-  BiFontFamily,
-  BiFontSize,
-  BiImage,
-  BiImageAlt,
   BiSidebar,
-  BiSolidBookAdd,
-  BiSolidBookAlt,
-  BiSolidBookmark,
   BiSolidBookmarkMinus,
-  BiSolidBookmarkStar,
   BiSolidFolderMinus,
   BiX,
 } from "react-icons/bi";
+import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
 import { Chapter, Novel } from "../types/Novel";
 import ChapterControls from "./ChapterControls";
-import ChapterSettings, { Setting, SettingsGroup } from "./ChapterSettings";
-import { ReactNode, useEffect, useState } from "react";
-import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
-import Link from "next/link";
+import ChapterSettings, { SettingsGroup } from "./ChapterSettings";
 
 interface Props {
   novel: Novel;
   chapter: Chapter;
-  settingsGroups: SettingsGroup[];
+  settings: SettingsGroup[];
 
   isOpen: boolean;
   setOpen: (value: boolean) => void;
@@ -49,14 +27,13 @@ interface Props {
 const ChapterSidebar = ({
   novel,
   chapter,
-  settingsGroups,
+  settings,
   isOpen,
   setOpen,
 }: Props) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [inLibrary, setInLibrary] = useState<boolean>(isInLibrary(novel.id));
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
-  const [showFont, setShowFont] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -151,47 +128,7 @@ const ChapterSidebar = ({
 
           <Divider my="lg" color="transparent" />
 
-          <div
-            className={
-              "bg-primary-700 border-primary-400 rounded " +
-              (showFont ? "border-x border-b" : "")
-            }
-          >
-            <Button
-              variant="default"
-              justify="space-between"
-              className="font-normal text-secondary-400"
-              fullWidth
-              rightSection={<BiFont size={24} />}
-              onClick={() => {
-                setShowFont(!showFont);
-              }}
-            >
-              Font
-            </Button>
-
-            <div className={"p-2 space-y-1 " + (showFont ? "" : "hidden")}>
-              <Select
-                label="Font Family"
-                data={["Arial", "Calibri", "Times New Roman", "Roboto"]}
-              />
-              <NumberInput label="Font Size" />
-              <ColorInput label="Font Color" />
-            </div>
-          </div>
-
-          <Button
-            variant="default"
-            justify="space-between"
-            className="font-normal text-secondary-400"
-            fullWidth
-            rightSection={<BiImageAlt size={24} />}
-          >
-            Background
-            {/* Color, Opacity, Image{Picture(Genre/Random/Off),Blur,Brightness} */}
-          </Button>
-
-          <ChapterSettings groups={settingsGroups} />
+          <ChapterSettings groups={settings} />
         </div>
 
         {!isOpen && (

@@ -1,105 +1,150 @@
-import { Image } from "@mantine/core";
+import { ColorInput, Image, NumberInput, Select, Slider } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { BiArea, BiFont, BiImageAlt } from "react-icons/bi";
 import { useQuery } from "react-query";
 import ChapterControls from "../../../components/ChapterControls";
-import {
-  ChapterSettings,
-  Setting,
-  SettingsGroup,
-  getSetting,
-} from "../../../components/ChapterSettings";
+import { SettingsGroup, getSetting } from "../../../components/ChapterSettings";
 import ChapterSidebar from "../../../components/ChapterSidebar";
 import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
-import { Chapter, Novel } from "../../../types/Novel";
-import { BiFont } from "react-icons/bi";
+import { Novel } from "../../../types/Novel";
 
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
 
-  const propertyGroups = [
+  const settings: SettingsGroup[] = [
     {
       name: "Font",
       Icon: BiFont,
       settings: [
         {
           name: "Font Family",
-          type: "select",
-          defaultValue: "Calibri",
-          options: ["Arial", "Calibri", "Times New Roman"],
-          state: useState("Calibri"),
+          InputType: Select,
+          properties: {
+            defaultValue: "Nunito Sans",
+            data: [
+              "Arial",
+              "Calibri",
+              "Nunito Sans",
+              "Poppins",
+              "Times New Roman",
+            ],
+          },
+          state: useState("Nunito Sans"),
         },
         {
           name: "Font Size",
-          type: "number",
-          defaultValue: 18,
+          InputType: NumberInput,
+          properties: {
+            defaultValue: 18,
+            min: 8,
+            max: 72,
+          },
           state: useState(18),
-          min: 8,
-          max: 72,
         },
         {
           name: "Font Color",
-          type: "color",
-          defaultValue: "#CED4DA",
+          InputType: ColorInput,
+          properties: { defaultValue: "#CED4DA" },
           state: useState("#CED4DA"),
+        },
+      ],
+    },
+    {
+      name: "Background",
+      Icon: BiImageAlt,
+      settings: [
+        {
+          name: "Background Color",
+          InputType: ColorInput,
+          properties: { defaultValue: "#25262B" },
+          state: useState("#25262B"),
+        },
+        {
+          name: "Background Opacity",
+          InputType: Slider,
+          properties: {
+            defaultValue: 100,
+            step: 5,
+          },
+          state: useState(100),
+        },
+        {
+          name: "Background Image",
+          InputType: Select,
+          properties: {
+            defaultValue: "Match Genre",
+            data: ["Off", "Fixed", "Random", "Match Genre"],
+          },
+          state: useState("Match Genre"),
+        },
+        {
+          name: "Image Brightness",
+          InputType: Slider,
+          properties: {
+            defaultValue: 50,
+            step: 5,
+          },
+          state: useState(50),
+        },
+        {
+          name: "Image Blur",
+          InputType: Slider,
+          properties: {
+            defaultValue: 0,
+            max: 10,
+          },
+          state: useState(0),
+        },
+      ],
+    },
+    {
+      name: "Spacing",
+      Icon: BiArea,
+      settings: [
+        {
+          name: "Line Height",
+          InputType: NumberInput,
+          properties: {
+            defaultValue: 1.5,
+            min: 1,
+            max: 5,
+            decimalScale: 1,
+            fixedDecimalScale: true,
+            step: 0.5,
+          },
+          state: useState(1.5),
+        },
+        {
+          name: "Paragraph Spacing",
+          InputType: NumberInput,
+          properties: {
+            defaultValue: 32,
+            min: 0,
+            max: 100,
+          },
+          state: useState(32),
         },
       ],
     },
   ];
 
-  const properties = {
-    fontSize: {
-      name: "Font Size",
-      type: "number",
-      defaultValue: 18,
-      state: useState(18),
-      min: 8,
-      max: 72,
-    },
-
-    lineHeight: {
-      name: "Line Height",
-      type: "number",
-      defaultValue: 1.5,
-      state: useState(1.5),
-      min: 1,
-      max: 5,
-      precision: 1,
-      step: 0.5,
-    },
-
-    paragraphSpacing: {
-      name: "Paragraph Spacing",
-      type: "number",
-      defaultValue: 32,
-      state: useState(32),
-      min: 0,
-      max: 100,
-    },
-
-    textColor: {
-      name: "Text Color",
-      type: "color",
-      defaultValue: "#D4D4D8",
-      state: useState("#D4D4D8"),
-    },
-
-    backgroundColor: {
-      name: "Background Color",
-      type: "color",
-      defaultValue: "#25262B",
-      state: useState("#25262B"),
-    },
-  };
-
-  const fontSize = properties.fontSize.state[0];
-  const lineHeight = properties.lineHeight.state[0];
-  const paragraphSpacing = properties.paragraphSpacing.state[0];
-  const textColor = properties.textColor.state[0];
-  const backgroundColor = properties.backgroundColor.state[0];
+  const fontFamily: string = settings[0].settings[0].state[0];
+  const fontSize: number = settings[0].settings[1].state[0];
+  const textColor: string = settings[0].settings[2].state[0];
+  let bgOpacity = Math.floor(
+    (settings[1].settings[1].state[0] / 100) * 255
+  ).toString(16);
+  if (bgOpacity.length < 2) bgOpacity = "0" + bgOpacity;
+  const backgroundColor = settings[1].settings[0].state[0] + bgOpacity;
+  const borderColor = "#373A40" + bgOpacity;
+  const bgImageBrightness = settings[1].settings[3].state[0];
+  const bgImageBlur = settings[1].settings[4].state[0];
+  const lineHeight = settings[2].settings[0].state[0];
+  const paragraphSpacing = settings[2].settings[1].state[0];
 
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -113,11 +158,14 @@ export default function ChapterContent() {
   });
 
   useEffect(() => {
-    Object.keys(properties).forEach((key) => {
-      let saved = getSetting(key);
-      if (saved != undefined) {
-        properties[key].state[1](saved);
-      }
+    settings.forEach((group) => {
+      group.settings.forEach((setting) => {
+        let saved = getSetting(setting.name.toLowerCase().replaceAll(" ", "_"));
+
+        if (saved != undefined) {
+          setting.state[1](saved);
+        }
+      });
     });
   }, []);
 
@@ -137,12 +185,12 @@ export default function ChapterContent() {
   return (
     <>
       <div
-        className="fixed top-0 w-screen h-screen -z-20 brightness-[50%]"
+        className="fixed top-0 w-screen h-screen -z-20"
         style={{
           backgroundImage:
             "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
-          // backgroundImage: "url(https://source.unsplash.com/random/1920x1080)",
           backgroundAttachment: "repeat",
+          filter: `brightness(${bgImageBrightness}%) blur(${bgImageBlur}px)`,
         }}
       />
 
@@ -152,9 +200,35 @@ export default function ChapterContent() {
       >
         <div
           className="flex flex-col panel space-y-10 border-x-2 border-primary-400"
-          style={{ backgroundColor }}
+          style={{ backgroundColor, borderColor }}
         >
-          {true && <ChapterHeader novel={novelData} chapter={chapterData} />}
+          <div className="flex justify-between items-center text-xl">
+            <div className="flex">
+              <Image
+                className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
+                alt={novelData.title}
+                src={novelData.image}
+                height={100}
+                width={75}
+                radius="md"
+              />
+              <div className="mx-5 flex flex-col space-y-2 justify-center">
+                <a
+                  className="text-2xl sm:text-3xl font-bold line-clamp-1 hover:underline"
+                  href={"/novel/" + novelData.id}
+                  title={novelData.title}
+                  style={{ color: textColor }}
+                >
+                  {novelData.title}
+                </a>
+                <ChapterControls
+                  novelId={novelData.id}
+                  chapters={novelData.chapters}
+                  current={chapterData}
+                />
+              </div>
+            </div>
+          </div>
 
           <div>
             {chapterData.content.map((text, index) => {
@@ -164,8 +238,9 @@ export default function ChapterContent() {
                   style={{
                     margin:
                       index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
+                    fontFamily,
                     fontSize: fontSize + "px",
-                    lineHeight: lineHeight,
+                    lineHeight,
                     color: textColor,
                   }}
                 >
@@ -186,7 +261,7 @@ export default function ChapterContent() {
         <ChapterSidebar
           novel={novelData}
           chapter={chapterData}
-          settingsGroups={propertyGroups as SettingsGroup[]}
+          settings={settings}
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}
         />
@@ -194,39 +269,3 @@ export default function ChapterContent() {
     </>
   );
 }
-
-interface ChapterHeaderProps {
-  novel: Novel;
-  chapter: Chapter;
-}
-
-const ChapterHeader = ({ novel, chapter }: ChapterHeaderProps) => {
-  return (
-    <div className="flex justify-between items-center text-xl">
-      <div className="flex">
-        <Image
-          className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
-          alt={novel.title}
-          src={novel.image}
-          height={100}
-          width={75}
-          radius="md"
-        />
-        <div className="m-5">
-          <a
-            className="text-2xl sm:leading-[2.75rem] sm:text-4xl font-bold line-clamp-1 hover:text-accent-300 fade"
-            href={"/novel/" + novel.id}
-            title={novel.title}
-          >
-            {novel.title}
-          </a>
-          <ChapterControls
-            novelId={novel.id}
-            chapters={novel.chapters}
-            current={chapter}
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
