@@ -78,7 +78,7 @@ const ChapterSidebar = ({
             <Link
               href={`/novel/${novel.id}`}
               title={novel.title}
-              className="text-lg font-bold line-clamp-3 hover:text-accent-300 fade"
+              className="text-lg font-bold line-clamp-3 hover:underline"
             >
               {novel.title}
             </Link>

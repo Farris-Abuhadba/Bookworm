@@ -10,6 +10,15 @@ import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Novel } from "../../../types/Novel";
 
+/*
+
+- PHONE RESPONSIVE UI
+- BACKGROUND IMAGE SELECTION
+- MINIMUM CHAPTER CONTROL WIDTH
+- HIDE BOOKMARK/COMMENTS BUTTON
+
+*/
+
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
