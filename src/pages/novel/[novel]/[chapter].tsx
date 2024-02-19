@@ -1,4 +1,5 @@
 import { ColorInput, Image, NumberInput, Select, Slider } from "@mantine/core";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { BiArea, BiFont, BiImageAlt } from "react-icons/bi";
@@ -10,13 +11,6 @@ import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
 import { Novel } from "../../../types/Novel";
 
-/*
-
-- PHONE RESPONSIVE UI
-- MINIMUM CHAPTER CONTROL WIDTH
-- HIDE BOOKMARK/COMMENTS BUTTON
-
-*/
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -269,7 +263,7 @@ export default function ChapterContent() {
           }}
         >
           <div className="flex justify-between items-center text-xl">
-            <div className="flex">
+            <div className="flex min-w-[50%]">
               <Image
                 className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
                 alt={novelData.title}
@@ -278,15 +272,15 @@ export default function ChapterContent() {
                 width={75}
                 radius="md"
               />
-              <div className="mx-5 flex flex-col space-y-2 justify-center">
-                <a
-                  className="text-2xl sm:text-3xl font-bold line-clamp-1 hover:underline"
+              <div className="sm:mx-5 flex flex-col space-y-2 justify-center w-full">
+                <Link
+                  className="text-2xl sm:text-3xl font-bold line-clamp-2 sm:line-clamp-1 hover:underline"
                   href={"/novel/" + novelData.id}
                   title={novelData.title}
                   style={{ color: textColor }}
                 >
                   {novelData.title}
-                </a>
+                </Link>
                 <ChapterControls
                   novelId={novelData.id}
                   chapters={novelData.chapters}
@@ -317,7 +311,7 @@ export default function ChapterContent() {
           </div>
 
           <ChapterControls
-            className="self-center"
+            className="self-center w-full md:w-3/4 lg:w-1/2"
             novelId={novelData.id}
             chapters={novelData.chapters}
             current={chapterData}

@@ -2,18 +2,15 @@ import { ActionIcon, Button, Divider, Image, Progress } from "@mantine/core";
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
 import {
-  BiBookmarkPlus,
-  BiChat,
   BiFolderPlus,
   BiSidebar,
-  BiSolidBookmarkMinus,
   BiSolidFolderMinus,
   BiX,
 } from "react-icons/bi";
 import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
 import { Chapter, Novel } from "../types/Novel";
 import ChapterControls from "./ChapterControls";
-import ChapterSettings, { SettingsGroup } from "./ChapterSettings";
+import ChapterSettings, { SettingsGroup, setSetting } from "./ChapterSettings";
 
 interface Props {
   novel: Novel;
@@ -33,7 +30,7 @@ const ChapterSidebar = ({
 }: Props) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [inLibrary, setInLibrary] = useState<boolean>(isInLibrary(novel.id));
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
+  // const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,7 +52,7 @@ const ChapterSidebar = ({
     <div>
       <div
         className={
-          "sticky overflow-x-hidden top-0 transition-all z-10 " + // positioning
+          "fixed md:sticky overflow-x-hidden top-0 right-0 transition-all z-50 " + // positioning
           "flex flex-col w-80 max-w-80 h-screen p-4 " + // size
           "bg-primary-600 border-l-2 border-primary-400 " + // color
           (isOpen ? "mr-0" : "-mr-80")
@@ -65,6 +62,7 @@ const ChapterSidebar = ({
           <ActionIcon
             onClick={() => {
               setOpen(false);
+              setSetting("sidebar_open", false);
             }}
             variant="default"
             size="lg"
@@ -109,7 +107,7 @@ const ChapterSidebar = ({
             striped
             animated={scrollProgress >= 1}
           />
-          <SideButton
+          {/* <SideButton
             Icon={isBookmarked ? BiSolidBookmarkMinus : BiBookmarkPlus}
             onClick={() => {
               alert("Not yet implemented");
@@ -124,7 +122,7 @@ const ChapterSidebar = ({
             }}
           >
             Comments
-          </SideButton>
+          </SideButton> */}
 
           <Divider my="lg" color="transparent" />
 
@@ -136,6 +134,7 @@ const ChapterSidebar = ({
             className="top-2 right-2 fixed"
             onClick={() => {
               setOpen(true);
+              setSetting("sidebar_open", true);
             }}
             variant="default"
             size="lg"
