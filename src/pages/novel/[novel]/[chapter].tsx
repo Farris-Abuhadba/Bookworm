@@ -13,7 +13,6 @@ import { Novel } from "../../../types/Novel";
 /*
 
 - PHONE RESPONSIVE UI
-- BACKGROUND IMAGE SELECTION
 - MINIMUM CHAPTER CONTROL WIDTH
 - HIDE BOOKMARK/COMMENTS BUTTON
 
@@ -82,11 +81,36 @@ export default function ChapterContent() {
           state: useState(100),
         },
         {
+          name: "Background Blur",
+          InputType: Slider,
+          properties: {
+            defaultValue: 5,
+            max: 10,
+          },
+          state: useState(5),
+        },
+        {
           name: "Background Image",
           InputType: Select,
           properties: {
             defaultValue: "Match Genre",
-            data: ["Off", "Fixed", "Random", "Match Genre"],
+            data: [
+              { group: "", items: ["Off", "Random", "Match Genre"] },
+              {
+                group: "Custom Selection",
+                items: [
+                  "Action",
+                  "Adventure",
+                  "Cultivation",
+                  "Demons",
+                  "Fantasy",
+                  "Horror",
+                  "Martial Arts",
+                  "Sci-fi",
+                ],
+              },
+            ],
+            allowDeselect: false,
           },
           state: useState("Match Genre"),
         },
@@ -150,10 +174,14 @@ export default function ChapterContent() {
   if (bgOpacity.length < 2) bgOpacity = "0" + bgOpacity;
   const backgroundColor = settings[1].settings[0].state[0] + bgOpacity;
   const borderColor = "#373A40" + bgOpacity;
-  const bgImageBrightness = settings[1].settings[3].state[0];
-  const bgImageBlur = settings[1].settings[4].state[0];
+  const bgBlur = settings[1].settings[2].state[0];
+  const bgImage = settings[1].settings[3].state[0];
+  const bgImageBrightness = settings[1].settings[4].state[0];
+  const bgImageBlur = settings[1].settings[5].state[0];
   const lineHeight = settings[2].settings[0].state[0];
   const paragraphSpacing = settings[2].settings[1].state[0];
+
+  const [activeBgImage, setActiveBgImage] = useState<string>("Off");
 
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
@@ -165,6 +193,9 @@ export default function ChapterContent() {
       ).then((response) => response.json()),
     enabled: router.isReady,
   });
+  const { data: novelData, isLoading: isNovelLoading } = GetNovelData(
+    novel as string
+  );
 
   useEffect(() => {
     settings.forEach((group) => {
@@ -178,38 +209,64 @@ export default function ChapterContent() {
     });
   }, []);
 
-  if (!router.isReady || isLoading) return <LoadingScreen />;
+  useEffect(() => {
+    if (bgImage == null || bgImage == "Off") return;
+
+    var bgImageChoices = settings[1].settings[3].properties.data[1]["items"];
+    let newImage = "";
+
+    if (bgImage == "Random") {
+      newImage =
+        bgImageChoices[Math.floor(Math.random() * bgImageChoices.length)];
+    } else if (bgImage == "Match Genre") {
+      if (novelData == null) return;
+      var intersection = [...novelData.genres].filter((x) =>
+        bgImageChoices.includes(x)
+      );
+
+      newImage = intersection[Math.floor(Math.random() * intersection.length)];
+    } else {
+      newImage = bgImage;
+    }
+
+    setActiveBgImage(newImage.replaceAll(" ", "_"));
+  }, [bgImage, isNovelLoading]);
+
+  if (!router.isReady || isLoading || isNovelLoading) return <LoadingScreen />;
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
   if (lastReadChapters == undefined) lastReadChapters = {};
   lastReadChapters[novel.toString()] = currentChapter;
   localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
 
-  const novelData: Novel = JSON.parse(sessionStorage.getItem(novel.toString()));
-  if (!novelData) location.href = "/novel/" + novel;
-
   if (chapterData.error != undefined)
     return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
 
   return (
     <>
-      <div
-        className="fixed top-0 w-screen h-screen -z-20"
-        style={{
-          backgroundImage:
-            "url(https://papers.co/wallpaper/papers.co-vv24-map-curves-dark-pattern-background-bw-33-iphone6-wallpaper.jpg)",
-          backgroundAttachment: "repeat",
-          filter: `brightness(${bgImageBrightness}%) blur(${bgImageBlur}px)`,
-        }}
-      />
+      {bgImage != "Off" && (
+        <div
+          className="fixed top-0 w-screen h-screen -z-20 hidden sm:block"
+          style={{
+            backgroundImage: `url(/images/backgrounds/${activeBgImage}.png)`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            filter: `brightness(${bgImageBrightness}%) blur(${bgImageBlur}px)`,
+          }}
+        />
+      )}
 
       <div
         className="grid w-full h-full m-0 p-0 overflow-x-clip"
         style={{ gridTemplateColumns: "auto min-content min-content" }}
       >
         <div
-          className="flex flex-col panel space-y-10 border-x-2 border-primary-400"
-          style={{ backgroundColor, borderColor }}
+          className="flex flex-col panel space-y-10 sm:border-x-2 border-primary-400 px-4 py-2 sm:px-14 sm:py-8"
+          style={{
+            backgroundColor,
+            borderColor,
+            backdropFilter: `blur(${bgBlur}px)`,
+          }}
         >
           <div className="flex justify-between items-center text-xl">
             <div className="flex">

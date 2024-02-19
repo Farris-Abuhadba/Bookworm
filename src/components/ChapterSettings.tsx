@@ -1,4 +1,4 @@
-import { ActionIcon, Button } from "@mantine/core";
+import { ActionIcon, Button, ComboboxData } from "@mantine/core";
 import { useState } from "react";
 import { BiReset } from "react-icons/bi";
 
@@ -10,7 +10,8 @@ export interface Setting {
     defaultValue: string | number;
 
     // Select Input
-    data?: string[];
+    data?: ComboboxData;
+    allowDeselect?: boolean;
 
     // Number Input
     min?: number;
@@ -143,7 +144,7 @@ export const getSetting = (key: string, defaultValue?: any) => {
   return storedValue;
 };
 
-const setSetting = (key: string, value: any) => {
+export const setSetting = (key: string, value: any) => {
   var settings = JSON.parse(localStorage.getItem("settings"));
   if (settings == undefined) settings = {};
 
