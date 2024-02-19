@@ -9,13 +9,35 @@ import { SettingsGroup, getSetting } from "../../../components/ChapterSettings";
 import ChapterSidebar from "../../../components/ChapterSidebar";
 import ErrorScreen from "../../../components/ErrorScreen";
 import LoadingScreen from "../../../components/LoadingScreen";
-import { Novel } from "../../../types/Novel";
-
+import {
+  gabriela,
+  inter,
+  lora,
+  merriweather,
+  montserrat,
+  nunitoSans,
+  poppins,
+  roboto,
+  spectral,
+} from "../../../fonts";
+import { GetNovelData } from "../[novel]";
 
 export default function ChapterContent() {
   const router = useRouter();
   const { novel, chapter } = router.query;
   const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
+
+  const fonts = {
+    Poppins: poppins,
+    Gabriela: gabriela,
+    Inter: inter,
+    Lora: lora,
+    Merriweather: merriweather,
+    Montserrat: montserrat,
+    "Nunito Sans": nunitoSans,
+    Roboto: roboto,
+    Spectral: spectral,
+  };
 
   const settings: SettingsGroup[] = [
     {
@@ -26,16 +48,11 @@ export default function ChapterContent() {
           name: "Font Family",
           InputType: Select,
           properties: {
-            defaultValue: "Nunito Sans",
-            data: [
-              "Arial",
-              "Calibri",
-              "Nunito Sans",
-              "Poppins",
-              "Times New Roman",
-            ],
+            defaultValue: "Poppins",
+            data: Object.keys(fonts),
+            allowDeselect: false,
           },
-          state: useState("Nunito Sans"),
+          state: useState("Poppins"),
         },
         {
           name: "Font Size",
@@ -201,6 +218,8 @@ export default function ChapterContent() {
         }
       });
     });
+
+    setSidebarOpen(getSetting("sidebar_open"));
   }, []);
 
   useEffect(() => {
@@ -290,7 +309,14 @@ export default function ChapterContent() {
             </div>
           </div>
 
-          <div>
+          <div
+            style={{
+              fontFamily: `${fonts[fontFamily]?.style.fontFamily}`,
+              fontSize: fontSize + "px",
+              lineHeight,
+              color: textColor,
+            }}
+          >
             {chapterData.content.map((text, index) => {
               return (
                 <p
@@ -298,10 +324,6 @@ export default function ChapterContent() {
                   style={{
                     margin:
                       index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
-                    fontFamily,
-                    fontSize: fontSize + "px",
-                    lineHeight,
-                    color: textColor,
                   }}
                 >
                   {text}
