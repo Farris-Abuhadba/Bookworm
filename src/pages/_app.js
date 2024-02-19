@@ -1,6 +1,7 @@
 import { MantineProvider, createTheme } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
+import { poppins } from "../fonts";
 import Layout from "../components/Layout";
 
 import "@mantine/core/styles.css";
@@ -82,9 +83,11 @@ export default function App(props) {
           defaultColorScheme="dark"
           theme={mantineTheme}
         >
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <main className={`${poppins.variable} font-sans`}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </main>
         </MantineProvider>
         <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
       </QueryClientProvider>
