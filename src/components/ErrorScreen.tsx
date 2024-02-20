@@ -15,7 +15,6 @@ const ErrorScreen = ({ title, children }: Props) => {
         className="w-fit h-fit"
         title={title}
         color="red"
-        variant="outline"
       >
         {children}
       </Alert>

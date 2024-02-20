@@ -16,35 +16,21 @@ import NovelList from "./NovelList";
 SwiperCore.use([Autoplay, FreeMode, Pagination, Scrollbar]);
 
 export default function NovelShowcase() {
-  useEffect(() => {
-    getNovels();
-  }, []);
-
-  const getNovels = async () => {
-    const response = await fetch("/api/hot-novels", {
-      method: "get",
-      headers: {
-        "content-type": "application/json",
-      },
-    });
-
-    const data = await response.json();
-    return data;
-  };
-
-  const {
-    data: novels,
-    error,
-    isLoading,
-  } = useQuery(["hotNovels", getNovels], () => getNovels());
+  const { data, isError, isLoading } = useQuery(
+    "novels",
+    async () => {
+      const response = await fetch("/api/novels");
+      const data = await response.json();
+      return data;
+    },
+    { staleTime: 900000 }
+  );
 
   if (isLoading) return <LoadingScreen />;
-  if (error)
-    return (
-      <ErrorScreen title="API Error">Could not connect to API</ErrorScreen>
-    );
+  if (isError || !data.success)
+    return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
 
-  const novelsArray = novels as Novel[];
+  const novels = data["data"] as { [category: string]: Novel[] };
 
   return (
     <div className="panel space-y-8">
@@ -56,7 +42,7 @@ export default function NovelShowcase() {
         autoplay={{ delay: 10000, pauseOnMouseEnter: true }}
         className="!pb-8"
       >
-        {novels.map((novel, index) => {
+        {novels["popular"].map((novel, index) => {
           return (
             <SwiperSlide key={"slide_" + index} className="px-2">
               <NovelCardDetailed novel={novel} />
@@ -65,19 +51,9 @@ export default function NovelShowcase() {
         })}
       </Swiper>
 
-      <NovelCarousel
-        title="Trending"
-        novels={novelsArray}
-        fullPageUrl="/trending"
-      />
-
-      <NovelList title="Lastest Updates" novels={novelsArray} />
-
-      <NovelCarousel
-        title="New Releases"
-        novels={novelsArray}
-        fullPageUrl="/completed"
-      />
+      <NovelCarousel title="Trending" novels={novels["trending"]} />
+      <NovelList title="Lastest Updates" novels={novels["latest"]} />
+      <NovelCarousel title="New Releases" novels={novels["new"]} />
     </div>
   );
 }
