@@ -42,8 +42,8 @@ export const ChapterSettings = ({ groups }: ChapterSettingsProps) => {
 
   return (
     <>
-      {groups.map((group) => {
-        return <SettingsGroupButton open={group.open} {...group} />;
+      {groups.map((group, index) => {
+        return <SettingsGroupButton open={group.open} {...group} key={index} />;
       })}
     </>
   );
@@ -90,9 +90,9 @@ const SettingsGroupButton = ({
       </Button>
 
       <div className={"p-2 space-y-2 " + (open[0] ? "" : "hidden")}>
-        {settings.map((setting) => {
+        {settings.map((setting, index) => {
           return (
-            <div>
+            <div key={index}>
               <div className="flex justify-between">
                 <p className="font-medium text-sm">{setting.name}</p>
                 <ActionIcon
