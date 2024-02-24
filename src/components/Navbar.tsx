@@ -97,7 +97,7 @@ const SideMenu = ({ menuOpen, setMenuOpen, pinned, setPinned }) => {
 
     console.log(novels);
     setRecentNovels(novels);
-  }, [setRecentNovels]);
+  }, [setRecentNovels, pinned, setPinned]);
 
   return (
     <div
@@ -189,7 +189,7 @@ const MenuButton = ({
 
   useEffect(() => {
     setActive(location.pathname == link);
-  });
+  }, [link]);
 
   return (
     <Link
@@ -231,6 +231,7 @@ const NovelButton = ({ image, title, id, setMenuOpen }) => {
         width={34}
         height={49}
         src={image}
+        alt={title}
       />
       <span className="line-clamp-2 h-full shrink max-w-[70%] sm:max-w-[150px]">
         {title}

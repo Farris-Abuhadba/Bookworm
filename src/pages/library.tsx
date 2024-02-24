@@ -71,6 +71,7 @@ const NovelRow = ({ novelId, index }) => {
               width={64}
               height={80}
               src={novel.image}
+              alt=""
             />
           </div>
           <span className="line-clamp-3" title={novel.title}>

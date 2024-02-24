@@ -24,7 +24,7 @@ const NovelList = ({ title, novels }: Props) => {
               }
               href={"/novel/" + novel.id}
             >
-              <Image w={64} h={90} src={novel.image} />
+              <Image w={64} h={90} src={novel.image} alt="" />
               <div className="w-full p-2 flex flex-col justify-between">
                 <span className="line-clamp-2 text-secondary-100">
                   {novel.title}

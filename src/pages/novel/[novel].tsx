@@ -27,6 +27,7 @@ export default function NovelPage() {
           className="saturate-100x opacity-25 blur-md"
           h={480}
           src={novel.image}
+          alt=""
         />
       </div>
       <div className="sticky -top-1 h-0 mt-[400px] -z-10">

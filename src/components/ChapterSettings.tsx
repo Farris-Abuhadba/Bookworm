@@ -37,6 +37,7 @@ interface ChapterSettingsProps {
 
 export const ChapterSettings = ({ groups }: ChapterSettingsProps) => {
   for (let i = 0; i < groups.length; i++) {
+    /* eslint-disable-next-line react-hooks/rules-of-hooks */
     groups[i].open = useState<boolean>(false);
   }
 

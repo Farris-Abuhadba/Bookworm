@@ -38,7 +38,7 @@ const NovelPanel = ({ novel }: Props) => {
   return (
     <div className="sm:flex space-x-4">
       <div className="relative shrink-0 w-fit h-fit mx-auto sm:mx-0 rounded overflow-clip">
-        <Image w={288} h={405} src={novel.image} />
+        <Image w={288} h={405} src={novel.image} alt="" />
       </div>
       <div className="flex flex-col justify-between my-4">
         <h1

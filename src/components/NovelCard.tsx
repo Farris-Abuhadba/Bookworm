@@ -15,6 +15,7 @@ export const NovelCard = ({ novel }: Props) => {
           w={128}
           h={180}
           src={novel.image}
+          alt=""
         />
       </div>
       <span
@@ -59,6 +60,7 @@ export const NovelCardDetailed = ({ novel }: Props) => {
         w={128}
         h={180}
         src={novel.image}
+        alt=""
       />
 
       <Image
@@ -66,6 +68,7 @@ export const NovelCardDetailed = ({ novel }: Props) => {
         w={375}
         h={180}
         src={novel.image}
+        alt=""
       />
     </Link>
   );

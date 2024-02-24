@@ -63,6 +63,7 @@ const Search = () => {
                         height={89}
                         src={novel.img}
                         radius="md"
+                        alt=""
                       />
                       <span className="text-xl">{novel.title}</span>
                     </>

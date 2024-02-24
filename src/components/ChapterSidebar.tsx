@@ -72,7 +72,13 @@ const ChapterSidebar = ({
           </ActionIcon>
 
           <div className="flex items-center space-x-2">
-            <Image w={70} h={101} radius="sm" src={novel.image} />
+            <Image
+              w={70}
+              h={101}
+              radius="sm"
+              src={novel.image}
+              alt={novel.title}
+            />
             <Link
               href={`/novel/${novel.id}`}
               title={novel.title}

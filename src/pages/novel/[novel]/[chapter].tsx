@@ -220,7 +220,7 @@ export default function ChapterContent() {
     });
 
     setSidebarOpen(getSetting("sidebar_open"));
-  }, []);
+  });
 
   useEffect(() => {
     if (bgImage == null || bgImage == "Off") return;
