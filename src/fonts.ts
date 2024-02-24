@@ -34,9 +34,9 @@ export const merriweather = Merriweather({
   weight: "400",
 });
 
-// export const montserrat = Montserrat({
-//   subsets: ["latin"],
-// });
+export const montserrat = Montserrat({
+  subsets: ["latin"],
+});
 
 export const nunitoSans = Nunito_Sans({
   subsets: ["latin"],
