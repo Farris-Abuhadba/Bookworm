@@ -17,6 +17,7 @@ const NovelList = ({ title, novels }: Props) => {
         {novels.map((novel, index) => {
           return (
             <Link
+              key={index}
               className={
                 "bg-primary-500 h-[90px] overflow-clip rounded" +
                 (index > 5 ? " hidden md:flex" : " flex")
