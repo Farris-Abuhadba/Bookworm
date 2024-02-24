@@ -99,7 +99,6 @@ const NovelRow = ({ novelId, index }) => {
             <Menu.Dropdown className="bg-zinc-800 border-zinc-600">
               <Menu.Item
                 color="red"
-                icon={<BiTrashAlt size={18} />}
                 onClick={() => {
                   removeFromLibrary(novelId);
                   removeRow(true);
