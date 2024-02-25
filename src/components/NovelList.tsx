@@ -1,6 +1,7 @@
 import { Image } from "@mantine/core";
 import Link from "next/link";
 import { Novel } from "../types/Novel";
+import RelativeTime from "@yaireo/relative-time";
 
 interface Props {
   title: string;
@@ -15,6 +16,8 @@ const NovelList = ({ title, novels }: Props) => {
       <span className="font-medium text-2xl">{title}</span>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-1 gap-x-3">
         {novels.map((novel, index) => {
+          let chapter = novel.chapters.slice(-1)[0];
+
           return (
             <Link
               key={index}
@@ -29,14 +32,16 @@ const NovelList = ({ title, novels }: Props) => {
                 <span className="line-clamp-2 text-secondary-100">
                   {novel.title}
                 </span>
-                <div className="flex space-x-3 text-secondary-500">
-                  <span className="shrink grow-0 line-clamp-1">
-                    Chaper {Math.round(Math.random() * 3000) + 10}
-                  </span>
-                  <span className="grow shrink-0 text-right">
-                    23 minutes ago
-                  </span>
-                </div>
+                {chapter && (
+                  <div className="flex space-x-3 text-secondary-500">
+                    <span className="shrink grow-0 line-clamp-1">
+                      {chapter.title}
+                    </span>
+                    <span className="grow shrink-0 text-right">
+                      {new RelativeTime().from(new Date(chapter.timestamp))}
+                    </span>
+                  </div>
+                )}
               </div>
             </Link>
           );
