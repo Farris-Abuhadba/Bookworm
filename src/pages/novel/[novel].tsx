@@ -48,10 +48,21 @@ export default function NovelPage() {
             <p
               className={
                 "p-4 bg-primary-500 rounded-b" +
-                (novel.description ? "" : " italic text-secondary-600")
+                (novel.description != null && novel.description != ""
+                  ? ""
+                  : " italic text-secondary-600")
               }
             >
-              {novel.description || "No description"}
+              {novel.description == null || novel.description == ""
+                ? "No description"
+                : novel.description.split("\n").map((line, index) => {
+                    return (
+                      <>
+                        {line}
+                        <br />
+                      </>
+                    );
+                  })}
             </p>
           </Tabs.Panel>
 

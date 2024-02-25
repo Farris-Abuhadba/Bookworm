@@ -36,11 +36,18 @@ const boxnovel_com_Novel = async (novelId: string) => {
       return { status: 404, success: false, error: "Novel not found" };
 
     const imageElement = novelDocument.querySelector("div.summary_image img");
-    const descriptionElement = novelDocument.querySelector("#editdescription");
+    const descriptionElements = novelDocument.querySelectorAll(
+      "div.description-summary p"
+    );
 
     title = titleElement.textContent?.trim() || "";
     image = imageElement.getAttribute("data-src") || "";
-    description = descriptionElement.textContent || "";
+    for (let i = 0; i < descriptionElements.length; i++) {
+      let line = descriptionElements[i].textContent;
+      if (line.includes("BOXNOVEL") || line.includes("__________")) break;
+      description += line + "\n\n";
+    }
+    description = description.trim();
 
     const authorElements = novelDocument.querySelectorAll(
       "div.author-content a"
