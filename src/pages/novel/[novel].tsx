@@ -1,5 +1,5 @@
+import { Image, Tabs } from "@mantine/core";
 import RelativeTime from "@yaireo/relative-time";
-import { BackgroundImage, Image, Tabs } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { BiSolidFile } from "react-icons/bi";
@@ -8,16 +8,18 @@ import ChapterList from "../../components/ChapterList";
 import ErrorScreen from "../../components/ErrorScreen";
 import LoadingScreen from "../../components/LoadingScreen";
 import NovelPanel from "../../components/NovelPanel";
-import { Chapter } from "../../types/Novel";
+import { Chapter, Novel } from "../../types/Novel";
 
 export default function NovelPage() {
   const router = useRouter();
-  const novelName = router.query.novel?.toString();
+  const novelId = router.query.novel?.toString();
 
-  const { data: novel, isLoading } = GetNovelData(novelName);
-  if (isLoading || !novel) return <LoadingScreen />;
-  if (novel.error)
-    return <ErrorScreen title="API Error">Novel not found</ErrorScreen>;
+  const { data, isLoading, isError } = GetNovelData(novelId);
+  if (isLoading || data == null) return <LoadingScreen />;
+  if (isError || !data.success)
+    return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
+
+  const novel: Novel = data.data;
   sessionStorage.setItem(novel.id, JSON.stringify(novel));
 
   return (
@@ -71,11 +73,22 @@ export const GetNovelData = (novelId: string) => {
   return useQuery({
     queryKey: ["novel", novelId],
     queryFn: async () => {
-      const response = await fetch(`/api/novel1?id=${novelId}`);
+      const savedIds = JSON.parse(localStorage.getItem("novels"));
+      if (savedIds == null || !(novelId in savedIds))
+        return {
+          success: false,
+          error:
+            "Novel's sources are not saved. This error is caused if you directly loaded this page by pasting a url. To load the nessecary data please find the novel on the home page or by searching",
+        };
+
+      const sources = Object.keys(savedIds[novelId]);
+      const response = await fetch(
+        `/api/novel?source=${sources[0]}&id=${savedIds[novelId][sources[0]]}`
+      );
       const data = await response.json();
       return data;
     },
-    enabled: !!novelId,
+    enabled: novelId != null,
     refetchOnWindowFocus: false,
   });
 };

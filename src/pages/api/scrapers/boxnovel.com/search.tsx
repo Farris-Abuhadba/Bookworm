@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Chapter, Novel } from "../../../../types/Novel";
 import { JSDOM } from "jsdom";
+import { createIdFromTitle } from "../../novel";
 
 const API_boxnovel_com_Search = async (
   req: NextApiRequest,
@@ -70,10 +71,7 @@ export const boxnovel_com_Search = async (query: string, sort: string) => {
         ).getTime() || 0;
 
       data.push({
-        id: title
-          .toLowerCase()
-          .replace(/[^a-z0-9\s]/g, "")
-          .replace(/[\s]/g, "-"), // "Example, The Novel 2" -> "example-the-novel-2"
+        id: createIdFromTitle(title),
         title,
         image,
         sourceIds: { "boxnovel.com": sourceId },

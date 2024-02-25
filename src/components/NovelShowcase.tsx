@@ -26,11 +26,29 @@ export default function NovelShowcase() {
     { staleTime: 900000 }
   );
 
+  var novels: { [category: string]: Novel[] } | null = null;
+  if (!isLoading && data.success) novels = data.data;
+
+  useEffect(() => {
+    if (novels == undefined) return;
+
+    var savedIds: { [id: string]: { [source: string]: string } } | null =
+      JSON.parse(localStorage.getItem("novels"));
+    if (savedIds == null) savedIds = {};
+
+    Object.keys(novels).forEach((category) => {
+      novels[category].forEach((novel) => {
+        if (savedIds[novel.id] == null) savedIds[novel.id] = {};
+        Object.assign(savedIds[novel.id], novel.sourceIds);
+      });
+    });
+
+    localStorage.setItem("novels", JSON.stringify(savedIds));
+  }, [novels]);
+
   if (isLoading) return <LoadingScreen />;
   if (isError || !data.success)
     return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
-
-  const novels = data["data"] as { [category: string]: Novel[] };
 
   return (
     <div className="panel space-y-8">
