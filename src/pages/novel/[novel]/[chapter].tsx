@@ -21,11 +21,12 @@ import {
   spectral,
 } from "../../../fonts";
 import { GetNovelData } from "../[novel]";
+import { Chapter, Novel } from "../../../types/Novel";
 
 export default function ChapterContent() {
   const router = useRouter();
-  const { novel, chapter } = router.query;
-  const currentChapter = Array.isArray(chapter) ? chapter[0] : chapter;
+  const novel = router.query["novel"] as string;
+  const chapter = router.query["chapter"] as string;
 
   const fonts = {
     Poppins: poppins,
@@ -196,17 +197,29 @@ export default function ChapterContent() {
 
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
-  const { data: chapterData, isLoading } = useQuery({
-    queryKey: ["chapter", novel, currentChapter],
-    queryFn: () =>
-      fetch(
-        `/api/boxNovelChapter?novelId=${novel}&chapterId=${currentChapter}`
-      ).then((response) => response.json()),
+  const { data, isLoading } = useQuery({
+    queryKey: ["chapter", novel, chapter],
+    queryFn: async () => {
+      const savedIds = JSON.parse(localStorage.getItem("novels"));
+      if (savedIds == null || !(novel in savedIds))
+        return {
+          success: false,
+          error:
+            "Novel's sources are not saved. This error can be caused if you directly loaded this page by pasting a url or cleared your cache. To load the nessecary data please find the novel on the home page or by searching",
+        };
+
+      const sources = Object.keys(savedIds[novel]);
+      const response = await fetch(
+        `/api/chapter?source=${sources[0]}&novel=${
+          savedIds[novel][sources[0]]
+        }&id=${chapter}`
+      );
+
+      return await response.json();
+    },
     enabled: router.isReady,
   });
-  const { data: novelData, isLoading: isNovelLoading } = GetNovelData(
-    novel as string
-  );
+  const { data: nData, isLoading: isNovelLoading } = GetNovelData(novel);
 
   useEffect(() => {
     settings.forEach((group) => {
@@ -232,8 +245,8 @@ export default function ChapterContent() {
       newImage =
         bgImageChoices[Math.floor(Math.random() * bgImageChoices.length)];
     } else if (bgImage == "Match Genre") {
-      if (novelData == null) return;
-      var intersection = [...novelData.genres].filter((x) =>
+      if (nData == null || nData.data == null) return;
+      var intersection = [...nData.data.genres].filter((x) =>
         bgImageChoices.includes(x)
       );
 
@@ -249,11 +262,14 @@ export default function ChapterContent() {
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
   if (lastReadChapters == undefined) lastReadChapters = {};
-  lastReadChapters[novel.toString()] = currentChapter;
+  lastReadChapters[novel] = chapter;
   localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
 
-  if (chapterData.error != undefined)
-    return <ErrorScreen title="API Error">{chapterData.error}</ErrorScreen>;
+  if (!data.success || !nData.success)
+    return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
+
+  const chapterData: Chapter = data.data;
+  const novelData: Novel = nData.data;
 
   return (
     <>

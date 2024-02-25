@@ -2,59 +2,70 @@ import { JSDOM } from "jsdom";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Chapter } from "../../../../types/Novel";
 
-const BOXNOVEL_API_Chapter = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { novelId, chapterId } = req.query;
+const API_boxnovel_com_Chapter = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  const novel: string = (req.query["novel"] || "") as string;
+  const id: string = (req.query["id"] || "") as string;
 
-  console.log(req.query);
+  var results = await boxnovel_com_Chapter(novel, id);
+  let status = results.status;
+  delete results["status"];
 
-  if (novelId == undefined || chapterId == undefined) {
-    res.status(404).json({ error: "Novel or chapter cannot be undefined" });
-    return;
+  res.status(status).json(results);
+};
+
+const boxnovel_com_Chapter = async (novel: string, id: string) => {
+  if (novel == undefined || novel == "") {
+    return { status: 404, success: false, error: "Novel not found" };
   }
 
+  if (id == undefined || id == "") {
+    return { status: 404, success: false, error: "Chapter not found" };
+  }
 
   try {
-    const tempTitle: string = `${chapterId}`
-    const parts: string[] = tempTitle.split('-')
-    const result: string = parts.slice(0,2).join('-')
-    const cleanChapterID = result;
-
-    const response = await fetch(
-      `https://boxnovel.com/novel/${novelId}-boxnovel/${cleanChapterID}`
-    );
+    const response = await fetch(`https://boxnovel.com/novel/${novel}/${id}`);
     const document = new JSDOM(await response.text()).window.document;
-    const title = chapterId.toString();
-    
-    // var watermark: String = document.querySelector(
-    //   ".comments > script:nth-child(2)"
-    // ).textContent;
-    // watermark = watermark.substring(
-    //   watermark.indexOf('replace("') + 9,
-    //   watermark.indexOf('", "")')
-    // );
+
+    const novelH1 = document.querySelector(
+      "div.profile-manga div.post-title h1"
+    );
+    if (novelH1 != null) {
+      return { status: 404, success: false, error: "Chapter not found" };
+    }
+
+    const titleElement = document.querySelector("h3");
+    if (titleElement == null) {
+      return { status: 404, success: false, error: "Novel not found" };
+    }
+
+    const title = titleElement.textContent || "";
 
     var content = [];
     var ps = document.querySelectorAll("div.text-left p");
     ps.forEach((p) => {
-      if (p && p.textContent != "")
+      if (p != null && p.textContent != "" && p.querySelector("i") == null)
         content.push(p.textContent);
     });
 
-
-
     const chapter: Chapter = {
+      id,
       title,
-      id: chapterId.toString(),
       content,
     };
-    
-    res.status(200).json(chapter);
+
+    return { status: 200, success: true, data: chapter };
   } catch (error) {
     console.error("An error occurred:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while extracting chapter data." });
+
+    return {
+      status: 500,
+      success: false,
+      error: "An error occurred while retreiving chapter data.",
+    };
   }
 };
 
-export default BOXNOVEL_API_Chapter;
+export default API_boxnovel_com_Chapter;
