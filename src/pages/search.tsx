@@ -91,7 +91,7 @@ const Search = () => {
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {novel.genres.map((genre) => {
-                        return <Pill>{genre}</Pill>;
+                        return <Pill key={genre}>{genre}</Pill>;
                       })}
                       <Pill className={"border " + statusColors[novel.status]}>
                         {novel.status}
