@@ -1,44 +1,30 @@
-import { TextInput } from "@mantine/core";
-import { BiSearchAlt2, BiSolidSearchAlt2 } from "react-icons/bi";
+import { Button, TextInput } from "@mantine/core";
 
 interface SearchBarProps {
-  searchValue: string;
-  setSearchValue(newValue: string): void;
+  inputValue: string;
+  setInputValue(newValue: string): void;
   handleSearch(): void;
 }
 
 const SearchBar = ({
-  searchValue,
-  setSearchValue,
+  inputValue,
+  setInputValue,
   handleSearch,
 }: SearchBarProps) => {
   return (
-    <div className="bg-zinc-800 border border-zinc-600 sm:rounded-md flex items-center">
+    <div className="flex space-x-2">
       <TextInput
-        value={searchValue}
-        onChange={(event) => setSearchValue(event.currentTarget.value)}
         onKeyDown={(event) => {
           if (event.key === "Enter") handleSearch();
         }}
+        value={inputValue}
+        onChange={(event) => setInputValue(event.currentTarget.value)}
         placeholder="Search for novels"
         variant="unstyled"
-        className="grow ps-1"
+        className="grow rounded ps-1 focus-within:border-accent-600 border border-transparent bg-primary-700"
       />
 
-      <div
-        title="Search"
-        className={
-          "w-[36px] h-[36px] flex justify-center items-center border-zinc-600 fade" +
-          (searchValue.length > 2
-            ? " text-zinc-400 hover:text-lavender-600 fade cursor-pointer"
-            : " text-zinc-600")
-        }
-        onClick={handleSearch}
-      >
-        {(searchValue.length < 3 && <BiSearchAlt2 size={24} />) || (
-          <BiSolidSearchAlt2 size={24} />
-        )}
-      </div>
+      <Button onClick={handleSearch}>Search</Button>
     </div>
   );
 };
