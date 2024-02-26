@@ -2,7 +2,7 @@ import { Button, Divider, Image, Menu, Progress, Title } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BiDotsVerticalRounded, BiTrashAlt } from "react-icons/bi";
-import { Chapter } from "../types/Novel";
+import { Chapter, Novel } from "../types/Novel";
 import { GetNovelData } from "./novel/[novel]";
 
 const LibraryPage = () => {
@@ -35,13 +35,16 @@ export default LibraryPage;
 
 const NovelRow = ({ novelId, index }) => {
   const [removed, removeRow] = useState(false);
-  const { data: novel, isLoading } = GetNovelData(novelId);
+  const { data, isLoading } = GetNovelData(novelId);
+
+  const novel: Novel = data?.data;
 
   if (removed)
     return (
       <RemovedNovelRow novel={novel} index={index} removeRow={removeRow} />
     );
-  if (isLoading || !novel) return <NovelRowSkeletonLoader index={index} />;
+  if (isLoading || novel == null)
+    return <NovelRowSkeletonLoader index={index} />;
 
   let lastRead = "";
   try {
