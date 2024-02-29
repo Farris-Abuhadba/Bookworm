@@ -38,29 +38,44 @@ const ChapterSidebar = ({
     const lines = document.querySelectorAll<HTMLElement>("#content p");
 
     const handleScroll = () => {
-      lines.forEach((line) => line.classList.remove("text-red-500"));
-
       let i = lines.length - 1;
       for (; i >= 0; i--) {
         if (
-          lines[i].offsetTop + lines[i].offsetHeight <
-          window.visualViewport.height + window.scrollY - 100
+          lines[i].getBoundingClientRect().top + lines[i].offsetHeight <=
+          window.visualViewport.height
         )
           break;
       }
 
       if (i > -1) {
-        lines[i].classList.add("text-red-500");
+        let lastReadChapters = JSON.parse(
+          localStorage.getItem("lastReadChapters")
+        );
+        lastReadChapters[novel.id]["progress"] = i;
+        localStorage.setItem(
+          "lastReadChapters",
+          JSON.stringify(lastReadChapters)
+        );
+
         setScrollProgress(++i);
-      } else console.log(i);
+      }
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
+    if (lines[scrollProgress] != null) {
+      lines[scrollProgress].scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+
+    window.addEventListener("scrollend", handleScroll);
+    window.addEventListener("resize", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scrollend", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
-  }, []);
+  }, [chapter]);
 
   return (
     <div>
@@ -113,15 +128,6 @@ const ChapterSidebar = ({
           >
             {inLibrary ? "Remove from Library" : "Add to Library"}
           </SideButton>
-          <p>
-            {scrollProgress}~
-            {Math.round((scrollProgress / chapter.content.length) * 100)}%
-          </p>
-          <p>
-            WSY: {window.scrollY}
-            <br></br>
-            DEH: {document.documentElement.scrollHeight}
-          </p>
 
           <Divider my="lg" color="transparent" />
 
@@ -132,7 +138,7 @@ const ChapterSidebar = ({
           />
           <Progress
             value={(scrollProgress / chapter.content.length) * 100}
-            transitionDuration={100}
+            transitionDuration={500}
             striped
             animated={scrollProgress >= chapter.content.length}
           />
