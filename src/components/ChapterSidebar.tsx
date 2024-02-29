@@ -33,12 +33,24 @@ const ChapterSidebar = ({
   // const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
   useEffect(() => {
+    const lines = document.querySelectorAll<HTMLElement>("#content p");
+
     const handleScroll = () => {
-      var h = document.documentElement,
-        b = document.body,
-        st = "scrollTop",
-        sh = "scrollHeight";
-      setScrollProgress((h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight));
+      lines.forEach((line) => line.classList.remove("text-red-500"));
+
+      let i = lines.length - 1;
+      for (; i >= 0; i--) {
+        if (
+          lines[i].offsetTop + lines[i].offsetHeight <
+          window.visualViewport.height + window.scrollY - 100
+        )
+          break;
+      }
+
+      if (i > -1) {
+        lines[i].classList.add("text-red-500");
+        setScrollProgress(++i);
+      } else console.log(i);
     };
 
     handleScroll();
@@ -99,6 +111,15 @@ const ChapterSidebar = ({
           >
             {inLibrary ? "Remove from Library" : "Add to Library"}
           </SideButton>
+          <p>
+            {scrollProgress}~
+            {Math.round((scrollProgress / chapter.content.length) * 100)}%
+          </p>
+          <p>
+            WSY: {window.scrollY}
+            <br></br>
+            DEH: {document.documentElement.scrollHeight}
+          </p>
 
           <Divider my="lg" color="transparent" />
 
@@ -108,10 +129,10 @@ const ChapterSidebar = ({
             current={chapter}
           />
           <Progress
-            value={scrollProgress * 100}
+            value={(scrollProgress / chapter.content.length) * 100}
             transitionDuration={100}
             striped
-            animated={scrollProgress >= 1}
+            animated={scrollProgress >= chapter.content.length}
           />
           {/* <SideButton
             Icon={isBookmarked ? BiSolidBookmarkMinus : BiBookmarkPlus}

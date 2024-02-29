@@ -326,6 +326,7 @@ export default function ChapterContent() {
           </div>
 
           <div
+            id="content"
             style={{
               fontFamily: `${fonts[fontFamily]?.style.fontFamily}`,
               fontSize: fontSize + "px",
