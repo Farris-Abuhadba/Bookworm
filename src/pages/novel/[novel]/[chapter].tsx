@@ -261,9 +261,13 @@ export default function ChapterContent() {
   if (!router.isReady || isLoading || isNovelLoading) return <LoadingScreen />;
 
   var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
-  if (lastReadChapters == undefined) lastReadChapters = {};
-  lastReadChapters[novel] = chapter;
-  localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
+  if (lastReadChapters == null) lastReadChapters = {};
+  var lastReadChapter = lastReadChapters[novel];
+  if (lastReadChapter == null || lastReadChapter["id"] != chapter) {
+    lastReadChapter = { id: chapter, progress: 0 };
+    lastReadChapters[novel] = lastReadChapter;
+    localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
+  }
 
   if (!data.success || !nData.success)
     return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
@@ -360,6 +364,7 @@ export default function ChapterContent() {
         <ChapterSidebar
           novel={novelData}
           chapter={chapterData}
+          chapterProgress={lastReadChapter["progress"]}
           settings={settings}
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}

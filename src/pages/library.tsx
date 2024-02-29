@@ -48,7 +48,9 @@ const NovelRow = ({ novelId, index }) => {
 
   let lastRead = "";
   try {
-    lastRead = JSON.parse(localStorage.getItem("lastReadChapters"))[novelId];
+    lastRead = JSON.parse(localStorage.getItem("lastReadChapters"))[novelId][
+      "id"
+    ];
   } catch {}
 
   let progress = 0;

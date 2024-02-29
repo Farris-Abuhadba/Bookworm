@@ -15,6 +15,7 @@ import ChapterSettings, { SettingsGroup, setSetting } from "./ChapterSettings";
 interface Props {
   novel: Novel;
   chapter: Chapter;
+  chapterProgress: number;
   settings: SettingsGroup[];
 
   isOpen: boolean;
@@ -24,11 +25,12 @@ interface Props {
 const ChapterSidebar = ({
   novel,
   chapter,
+  chapterProgress,
   settings,
   isOpen,
   setOpen,
 }: Props) => {
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(chapterProgress);
   const [inLibrary, setInLibrary] = useState<boolean>(isInLibrary(novel.id));
   // const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 

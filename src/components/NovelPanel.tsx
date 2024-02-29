@@ -1,20 +1,6 @@
-import {
-  Button,
-  Divider,
-  Group,
-  Image,
-  Pill,
-  Rating,
-  Stack,
-  Title,
-} from "@mantine/core";
+import { Button, Image, Pill, Rating } from "@mantine/core";
 import { ReactNode, useEffect, useState } from "react";
-import {
-  BiSolidBook,
-  BiSolidStar,
-  BiSolidStarHalf,
-  BiStar,
-} from "react-icons/bi";
+import { BiSolidBook, BiSolidStar, BiStar } from "react-icons/bi";
 import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
 import { Novel } from "../types/Novel";
 
@@ -32,7 +18,7 @@ const NovelPanel = ({ novel }: Props) => {
     var lastReadChapter = lastReadChapters[novel.id];
 
     if (lastReadChapter == undefined) return;
-    else setLastRead(lastReadChapter);
+    else setLastRead(lastReadChapter["id"]);
   }, [novel]);
 
   return (
