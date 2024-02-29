@@ -15,6 +15,7 @@ import ChapterSettings, { SettingsGroup, setSetting } from "./ChapterSettings";
 interface Props {
   novel: Novel;
   chapter: Chapter;
+  chapterProgress: number;
   settings: SettingsGroup[];
 
   isOpen: boolean;
@@ -24,29 +25,57 @@ interface Props {
 const ChapterSidebar = ({
   novel,
   chapter,
+  chapterProgress,
   settings,
   isOpen,
   setOpen,
 }: Props) => {
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [scrollProgress, setScrollProgress] = useState(chapterProgress);
   const [inLibrary, setInLibrary] = useState<boolean>(isInLibrary(novel.id));
   // const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
   useEffect(() => {
+    const lines = document.querySelectorAll<HTMLElement>("#content p");
+
     const handleScroll = () => {
-      var h = document.documentElement,
-        b = document.body,
-        st = "scrollTop",
-        sh = "scrollHeight";
-      setScrollProgress((h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight));
+      let i = lines.length - 1;
+      for (; i >= 0; i--) {
+        if (
+          lines[i].getBoundingClientRect().top + lines[i].offsetHeight <=
+          window.visualViewport.height
+        )
+          break;
+      }
+
+      if (i > -1) {
+        let lastReadChapters = JSON.parse(
+          localStorage.getItem("lastReadChapters")
+        );
+        lastReadChapters[novel.id]["progress"] = i;
+        localStorage.setItem(
+          "lastReadChapters",
+          JSON.stringify(lastReadChapters)
+        );
+
+        setScrollProgress(++i);
+      }
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
+    if (lines[scrollProgress] != null) {
+      lines[scrollProgress].scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
+
+    window.addEventListener("scrollend", handleScroll);
+    window.addEventListener("resize", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scrollend", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
-  }, []);
+  }, [chapter]);
 
   return (
     <div>
@@ -108,10 +137,10 @@ const ChapterSidebar = ({
             current={chapter}
           />
           <Progress
-            value={scrollProgress * 100}
-            transitionDuration={100}
+            value={(scrollProgress / chapter.content.length) * 100}
+            transitionDuration={500}
             striped
-            animated={scrollProgress >= 1}
+            animated={scrollProgress >= chapter.content.length}
           />
           {/* <SideButton
             Icon={isBookmarked ? BiSolidBookmarkMinus : BiBookmarkPlus}
