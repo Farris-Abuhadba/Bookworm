@@ -8,6 +8,7 @@ import {
   BiX,
 } from "react-icons/bi";
 import { addToLibrary, isInLibrary, removeFromLibrary } from "../pages/library";
+import { ChapterControlsSkeletonLoader } from "../pages/novel/[novel]/[chapter]";
 import { Chapter, Novel } from "../types/Novel";
 import ChapterControls from "./ChapterControls";
 import ChapterSettings, { SettingsGroup, setSetting } from "./ChapterSettings";
@@ -18,6 +19,9 @@ interface Props {
   chapterProgress: number;
   settings: SettingsGroup[];
 
+  isNovelLoading: boolean;
+  isChapterLoading: boolean;
+
   isOpen: boolean;
   setOpen: (value: boolean) => void;
 }
@@ -27,14 +31,23 @@ const ChapterSidebar = ({
   chapter,
   chapterProgress,
   settings,
+  isNovelLoading,
+  isChapterLoading,
   isOpen,
   setOpen,
 }: Props) => {
-  const [scrollProgress, setScrollProgress] = useState(chapterProgress);
-  const [inLibrary, setInLibrary] = useState<boolean>(isInLibrary(novel.id));
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [inLibrary, setInLibrary] = useState<boolean>(false);
   // const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
 
   useEffect(() => {
+    if (isNovelLoading || isChapterLoading) return;
+    setInLibrary(isInLibrary(novel.id));
+  });
+
+  useEffect(() => {
+    if (isNovelLoading) return;
+    setScrollProgress(chapterProgress);
     const lines = document.querySelectorAll<HTMLElement>("#content p");
 
     const handleScroll = () => {
@@ -61,8 +74,8 @@ const ChapterSidebar = ({
       }
     };
 
-    if (lines[scrollProgress] != null) {
-      lines[scrollProgress].scrollIntoView({
+    if (lines[chapterProgress] != null) {
+      lines[chapterProgress].scrollIntoView({
         behavior: "smooth",
         block: "end",
         inline: "nearest",
@@ -75,7 +88,7 @@ const ChapterSidebar = ({
       window.removeEventListener("scrollend", handleScroll);
       window.removeEventListener("resize", handleScroll);
     };
-  }, [chapter]);
+  }, [chapter, chapterProgress, isNovelLoading]);
 
   return (
     <div>
@@ -101,23 +114,28 @@ const ChapterSidebar = ({
           </ActionIcon>
 
           <div className="flex items-center space-x-2">
-            <Image
-              w={70}
-              h={101}
-              radius="sm"
-              src={novel.image}
-              alt={novel.title}
-            />
-            <Link
-              href={`/novel/${novel.id}`}
-              title={novel.title}
-              className="text-lg font-bold line-clamp-3 hover:underline"
-            >
-              {novel.title}
-            </Link>
+            {(isNovelLoading && <NovelHeaderSkeletonLoader />) || (
+              <>
+                <Image
+                  w={70}
+                  h={101}
+                  radius="sm"
+                  src={novel.image}
+                  alt={novel.title}
+                />
+                <Link
+                  href={`/novel/${novel.id}`}
+                  title={novel.title}
+                  className="text-lg font-bold line-clamp-3 hover:underline"
+                >
+                  {novel.title}
+                </Link>
+              </>
+            )}
           </div>
 
           <SideButton
+            disabled={isNovelLoading}
             Icon={inLibrary ? BiSolidFolderMinus : BiFolderPlus}
             onClick={() => {
               if (inLibrary) removeFromLibrary(novel.id);
@@ -131,17 +149,26 @@ const ChapterSidebar = ({
 
           <Divider my="lg" color="transparent" />
 
-          <ChapterControls
-            novelId={novel.id}
-            chapters={novel.chapters}
-            current={chapter}
-          />
-          <Progress
-            value={(scrollProgress / chapter.content.length) * 100}
-            transitionDuration={500}
-            striped
-            animated={scrollProgress >= chapter.content.length}
-          />
+          {((isChapterLoading || isNovelLoading) && (
+            <>
+              <ChapterControlsSkeletonLoader />
+              <Progress value={0} />
+            </>
+          )) || (
+            <>
+              <ChapterControls
+                novelId={novel.id}
+                chapters={novel.chapters}
+                current={chapter}
+              />
+              <Progress
+                value={(scrollProgress / chapter.content.length) * 100}
+                transitionDuration={500}
+                striped
+                animated={scrollProgress >= chapter.content.length}
+              />
+            </>
+          )}
           {/* <SideButton
             Icon={isBookmarked ? BiSolidBookmarkMinus : BiBookmarkPlus}
             onClick={() => {
@@ -187,16 +214,23 @@ interface SideButtonProps {
   Icon: any;
   children: ReactNode;
   rightIcon?: boolean;
+  disabled?: boolean;
   onClick?: (event: any) => void;
 }
 
-const SideButton = ({ Icon, children, onClick }: SideButtonProps) => {
+const SideButton = ({
+  Icon,
+  children,
+  onClick,
+  disabled = false,
+}: SideButtonProps) => {
   return (
     <Button
       variant="default"
       justify="space-between"
       className="font-normal text-secondary-400"
       fullWidth
+      disabled={disabled}
       leftSection={<Icon size={24} />}
       onClick={onClick}
     >
@@ -206,3 +240,15 @@ const SideButton = ({ Icon, children, onClick }: SideButtonProps) => {
 };
 
 export default ChapterSidebar;
+
+const NovelHeaderSkeletonLoader = () => {
+  return (
+    <>
+      <div className="w-[70px] h-[101px] shrink-0 rounded bg-secondary-400/25 animate-pulse" />
+      <div className="flex flex-col gap-2 w-full">
+        <div className="w-full h-6 rounded bg-secondary-400/25 animate-pulse" />
+        <div className="w-3/4 h-6 rounded bg-secondary-400/25 animate-pulse" />
+      </div>
+    </>
+  );
+};

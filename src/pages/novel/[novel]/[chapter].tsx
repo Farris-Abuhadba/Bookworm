@@ -1,14 +1,28 @@
-import { ColorInput, Image, NumberInput, Select, Slider } from "@mantine/core";
+import {
+  ActionIcon,
+  ColorInput,
+  Combobox,
+  Image,
+  InputBase,
+  NumberInput,
+  Select,
+  Slider,
+} from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { BiArea, BiFont, BiImageAlt } from "react-icons/bi";
+import {
+  BiArea,
+  BiFont,
+  BiImageAlt,
+  BiSolidChevronLeft,
+  BiSolidChevronRight,
+} from "react-icons/bi";
 import { useQuery } from "react-query";
 import ChapterControls from "../../../components/ChapterControls";
 import { SettingsGroup, getSetting } from "../../../components/ChapterSettings";
 import ChapterSidebar from "../../../components/ChapterSidebar";
 import ErrorScreen from "../../../components/ErrorScreen";
-import LoadingScreen from "../../../components/LoadingScreen";
 import {
   gabriela,
   inter,
@@ -20,8 +34,8 @@ import {
   roboto,
   spectral,
 } from "../../../fonts";
-import { GetNovelData } from "../[novel]";
 import { Chapter, Novel } from "../../../types/Novel";
+import { GetNovelData } from "../[novel]";
 
 export default function ChapterContent() {
   const router = useRouter();
@@ -197,7 +211,7 @@ export default function ChapterContent() {
 
   const [isSidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading: isCLoading } = useQuery({
     queryKey: ["chapter", novel, chapter],
     queryFn: async () => {
       const savedIds = JSON.parse(localStorage.getItem("novels"));
@@ -219,7 +233,11 @@ export default function ChapterContent() {
     },
     enabled: router.isReady,
   });
-  const { data: nData, isLoading: isNovelLoading } = GetNovelData(novel);
+  const { data: nData, isLoading: isNLoading } = GetNovelData(novel);
+
+  const isNovelLoading = !router.isReady || isNLoading || nData == null;
+  const isChapterLoading = !router.isReady || isCLoading || data == null;
+  const isLoading = isChapterLoading || isNovelLoading || !router.isReady;
 
   useEffect(() => {
     settings.forEach((group) => {
@@ -258,22 +276,30 @@ export default function ChapterContent() {
     setActiveBgImage(newImage.replaceAll(" ", "_"));
   }, [bgImage, isNovelLoading]);
 
-  if (!router.isReady || isLoading || isNovelLoading) return <LoadingScreen />;
+  const [lastReadProgress, setLastReadProgress] = useState(0);
+  useEffect(() => {
+    if (isLoading) return;
+    var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
+    if (lastReadChapters == null) lastReadChapters = {};
 
-  var lastReadChapters = JSON.parse(localStorage.getItem("lastReadChapters"));
-  if (lastReadChapters == null) lastReadChapters = {};
-  var lastReadChapter = lastReadChapters[novel];
-  if (lastReadChapter == null || lastReadChapter["id"] != chapter) {
-    lastReadChapter = { id: chapter, progress: 0 };
-    lastReadChapters[novel] = lastReadChapter;
-    localStorage.setItem("lastReadChapters", JSON.stringify(lastReadChapters));
-  }
+    var lastReadChapter = lastReadChapters[novel];
+    if (lastReadChapter == null || lastReadChapter["id"] != chapter) {
+      lastReadChapter = { id: chapter, progress: 0 };
+      lastReadChapters[novel] = lastReadChapter;
+      localStorage.setItem(
+        "lastReadChapters",
+        JSON.stringify(lastReadChapters)
+      );
+    }
 
-  if (!data.success || !nData.success)
+    setLastReadProgress(lastReadChapter["progress"]);
+  }, [novel, isLoading]);
+
+  if (!isLoading && (!data.success || !nData.success))
     return <ErrorScreen title="API Error">{data.error}</ErrorScreen>;
 
-  const chapterData: Chapter = data.data;
-  const novelData: Novel = nData.data;
+  const chapterData: Chapter = data?.data;
+  const novelData: Novel = nData?.data;
 
   return (
     <>
@@ -301,33 +327,39 @@ export default function ChapterContent() {
             backdropFilter: `blur(${bgBlur}px)`,
           }}
         >
-          <div className="flex justify-between items-center text-xl">
-            <div className="flex min-w-[50%]">
-              <Image
-                className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
-                alt={novelData.title}
-                src={novelData.image}
-                height={100}
-                width={75}
-                radius="md"
-              />
-              <div className="sm:mx-5 flex flex-col space-y-2 justify-center w-full">
-                <Link
-                  className="text-2xl sm:text-3xl font-bold line-clamp-2 sm:line-clamp-1 hover:underline"
-                  href={"/novel/" + novelData.id}
-                  title={novelData.title}
-                  style={{ color: textColor }}
-                >
-                  {novelData.title}
-                </Link>
-                <ChapterControls
-                  novelId={novelData.id}
-                  chapters={novelData.chapters}
-                  current={chapterData}
+          {(isNovelLoading && (
+            <ChapterHeaderSkeletonLoader color={textColor} />
+          )) || (
+            <div className="flex justify-between items-center text-xl">
+              <div className="flex w-full xl:w-fit min-w-[50%]">
+                <Image
+                  className="hidden sm:block h-[100px] w-[75px] shrink-0 rounded"
+                  alt={novelData.title}
+                  src={novelData.image}
+                  height={100}
+                  width={75}
+                  radius="md"
                 />
+                <div className="sm:mx-5 flex flex-col space-y-2 justify-center w-full">
+                  <Link
+                    className="text-2xl sm:text-3xl font-bold line-clamp-2 sm:line-clamp-1 hover:underline"
+                    href={"/novel/" + novelData.id}
+                    title={novelData.title}
+                    style={{ color: textColor }}
+                  >
+                    {novelData.title}
+                  </Link>
+                  {(isLoading && <ChapterControlsSkeletonLoader />) || (
+                    <ChapterControls
+                      novelId={novelData.id}
+                      chapters={novelData.chapters}
+                      current={chapterData}
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div
             id="content"
@@ -338,34 +370,43 @@ export default function ChapterContent() {
               color: textColor,
             }}
           >
-            {chapterData.content.map((text, index) => {
-              return (
-                <p
-                  key={index}
-                  style={{
-                    margin:
-                      index == 0 ? "0px" : paragraphSpacing + "px 0px 0px 0px",
-                  }}
-                >
-                  {text}
-                </p>
-              );
-            })}
+            {(isChapterLoading && (
+              <ChapterContentSkeletonLoader color={textColor} />
+            )) ||
+              chapterData.content.map((text, index) => {
+                return (
+                  <p
+                    key={index}
+                    style={{
+                      margin:
+                        index == 0
+                          ? "0px"
+                          : paragraphSpacing + "px 0px 0px 0px",
+                    }}
+                  >
+                    {text}
+                  </p>
+                );
+              })}
           </div>
 
-          <ChapterControls
-            className="self-center w-full md:w-3/4 lg:w-1/2"
-            novelId={novelData.id}
-            chapters={novelData.chapters}
-            current={chapterData}
-          />
+          {!isLoading && (
+            <ChapterControls
+              className="self-center w-full md:w-3/4 lg:w-1/2"
+              novelId={novelData.id}
+              chapters={novelData.chapters}
+              current={chapterData}
+            />
+          )}
         </div>
 
         <ChapterSidebar
           novel={novelData}
           chapter={chapterData}
-          chapterProgress={lastReadChapter["progress"]}
+          chapterProgress={lastReadProgress}
           settings={settings}
+          isNovelLoading={isNovelLoading}
+          isChapterLoading={isChapterLoading}
           isOpen={isSidebarOpen}
           setOpen={setSidebarOpen}
         />
@@ -373,3 +414,98 @@ export default function ChapterContent() {
     </>
   );
 }
+
+const ChapterHeaderSkeletonLoader = ({ color }) => {
+  color += "40";
+
+  return (
+    <div className="flex gap-4">
+      <div
+        className="hidden sm:block w-[75px] h-[100px] rounded animate-pulse "
+        style={{ backgroundColor: color }}
+      />
+      <div className="flex flex-col w-full xl:w-fit min-w-[50%] justify-center space-y-2">
+        <div
+          className="w-[250px] h-8 rounded animate-pulse "
+          style={{ backgroundColor: color }}
+        />
+        <ChapterControlsSkeletonLoader />
+      </div>
+    </div>
+  );
+};
+
+export const ChapterControlsSkeletonLoader = ({ className = "" }) => {
+  return (
+    <div className={"flex space-x-1 items-center " + className}>
+      <ActionIcon
+        title="Previous Chapter"
+        variant="default"
+        disabled
+        w={36}
+        h={36}
+      >
+        <BiSolidChevronLeft />
+      </ActionIcon>
+
+      <InputBase
+        disabled
+        component="button"
+        type="button"
+        pointer
+        rightSection={<Combobox.Chevron />}
+        rightSectionPointerEvents="none"
+        className="line-clamp-1 w-full"
+      >
+        <div className="bg-secondary-400/25 animate-pulse h-3 rounded" />
+      </InputBase>
+
+      <ActionIcon title="Next Chapter" variant="default" disabled w={36} h={36}>
+        <BiSolidChevronRight />
+      </ActionIcon>
+    </div>
+  );
+};
+
+const ChapterContentSkeletonLoader = ({ color }) => {
+  const content = [...Array(20)];
+  const sections = [
+    [15, 30],
+    [10, 45, 40, 25, 50, 40, 10],
+    [60, 35, 25, 5, 15, 35],
+    [20, 45, 15],
+    [30, 20, 40, 90],
+    [5, 40, 25, 30],
+    [40, 20],
+    [25, 45],
+    [40, 15, 5, 30, 45, 15, 30],
+    [10, 5, 10, 15, 40, 10],
+  ];
+
+  return (
+    <div className="space-y-12 animate-pulse">
+      {content.map((_, index) => {
+        let section = sections[index % sections.length];
+
+        return (
+          <div key={index} className="flex flex-wrap gap-2">
+            {section.map((_, index) => {
+              let width = section[index % section.length];
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    backgroundColor: color + "40",
+                    width: width + "%",
+                  }}
+                  className="rounded h-5 fade duration-1000"
+                />
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
