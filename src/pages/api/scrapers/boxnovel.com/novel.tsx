@@ -52,12 +52,11 @@ const API_boxnovel_com_Novel = async (
       return;
     }
 
-    // Cast existingNovelData to Novel type to access chapters property
     const novelData = existingNovelData as Novel;
 
     // Update chapter count and add chapters
     novelData.chapter_count = novelDataForDB.chapter_count;
-    novelData.chapters = chapters; // This assumes chapters is of type Chapter[]
+    novelData.chapters = chapters;
 
     // Return the updated novel data including the chapters
     res.status(200).json({ success: true, data: novelData });
