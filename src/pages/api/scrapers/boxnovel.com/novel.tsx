@@ -2,6 +2,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Novel, Chapter } from "../../../../types/Novel";
 import { JSDOM } from "jsdom";
 import { createIdFromTitle } from "../../novel";
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const API_boxnovel_com_Novel = async (
   req: NextApiRequest,
@@ -13,7 +18,64 @@ const API_boxnovel_com_Novel = async (
   let status = results.status;
   delete results["status"];
 
-  res.status(status).json(results);
+  // Temp store chapters to add it back in when sending to user
+  const chapters = results.data.chapters;
+
+  // Remove chapters from the novel object before sending it to DB
+  const novelDataForDB = {...results.data};
+  delete novelDataForDB.chapters;
+
+// Check if novel exists in DB
+  const {data: existingNovel, error} = await supabase
+    .from('novels')
+    .select('*')
+    .eq('id', novelDataForDB.id)
+    .maybeSingle();
+
+  if (error){
+    console.error('Error checking novel: ', error);
+    res.status(500).json({success: false, error: 'DB error'});
+    return;
+  }
+
+  if (existingNovel) {
+    // Novel exists, fetch the full novel data from DB
+    const { data: existingNovelData, error: fetchError } = await supabase
+      .from('novels')
+      .select('*') // Select all fields of the novel
+      .eq('id', novelDataForDB.id)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error('Error fetching full novel data:', fetchError);
+      res.status(500).json({ success: false, error: 'Database error' });
+      return;
+    }
+
+    const novelData = existingNovelData as Novel;
+
+    // Update chapter count and add chapters
+    novelData.chapter_count = novelDataForDB.chapter_count;
+    novelData.chapters = chapters;
+
+    // Return the updated novel data including the chapters
+    res.status(200).json({ success: true, data: novelData });
+
+  } else {
+      // Novel does not exist, insert new
+      const { data: insertedNovel, error: insertError } = await supabase
+        .from('novels')
+        .insert([novelDataForDB]);
+
+      if (insertError) {
+        console.error('Error inserting novel:', insertError);
+        res.status(500).json({ success: false, error: 'Database error' });
+        return;
+    }
+
+    console.log('Novel inserted:', novelDataForDB.id);
+    res.status(status).json(results);
+ }
 };
 
 const boxnovel_com_Novel = async (novelId: string) => {
@@ -124,4 +186,4 @@ const boxnovel_com_Novel = async (novelId: string) => {
   }
 };
 
-export default API_boxnovel_com_Novel;
+export default API_boxnovel_com_Novel;;
