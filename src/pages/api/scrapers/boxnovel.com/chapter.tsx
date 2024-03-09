@@ -46,8 +46,13 @@ const boxnovel_com_Chapter = async (novel: string, id: string) => {
     var content = [];
     var ps = document.querySelectorAll("div.text-left p");
     ps.forEach((p) => {
-      if (p != null && p.textContent != "" && p.querySelector("i") == null)
-        content.push(p.textContent);
+      if (p != null && p.textContent != "") {
+        p.querySelectorAll("i").forEach((i) => (i.textContent = ""));
+        p.textContent.split("\n").forEach((line) => {
+          let text = line.trim();
+          if (text != "") content.push(text);
+        });
+      }
     });
 
     const chapter: Chapter = {
