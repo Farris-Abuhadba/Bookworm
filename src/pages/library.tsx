@@ -1,9 +1,18 @@
-import { Button, Divider, Image, Menu, Progress, Title } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Image,
+  Menu,
+  Progress,
+  TextInput,
+  Title,
+} from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BiDotsVerticalRounded, BiTrashAlt } from "react-icons/bi";
 import { Chapter, Novel } from "../types/Novel";
 import { GetNovelData } from "./novel/[novel]";
+import FilterTernaryMultiselect from "../components/FilterMultiselect";
 
 const LibraryPage = () => {
   const [novelLibrary, setNovelLibrary] = useState([]);
@@ -14,13 +23,19 @@ const LibraryPage = () => {
   }, []);
 
   return (
-    <div className="panel space-y-2">
-      <Title
-        className="mb-4 -m-4 p-4 sm:rounded-t-md bg-lavender-900 text-lavender-50 outline outline-1 outline-lavender-600"
-        size="38px"
-      >
-        Library
-      </Title>
+    <div className="panel bg-primary-700">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
+        <TextInput />
+        <Button />
+        <FilterTernaryMultiselect
+          items={["Completed", "On Going", "Hiatus", "Dropped"]}
+        />
+        <Button />
+        <Button />
+        <Button />
+        <Button />
+      </div>
+
       {novelLibrary.map((novelId, index) => {
         return <NovelRow key={novelId} novelId={novelId} index={index} />;
       })}
@@ -35,7 +50,7 @@ export default LibraryPage;
 
 const NovelRow = ({ novelId, index }) => {
   const [removed, removeRow] = useState(false);
-  const { data, isLoading } = GetNovelData(novelId);
+  const { data, isLoading } = { data: { data: null }, isLoading: true }; // GetNovelData(novelId);
 
   const novel: Novel = data?.data;
 
