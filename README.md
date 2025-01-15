@@ -1,16 +1,25 @@
-# Bookworm - Light Novel and Manga Reader
+# Bookworm - Light Novel Reader
 
-## Setup
+> [!WARNING]
+> This project is no longer mantained
 
-### Clone the project
+## Screenshots
 
-```bash
-  git clone https://github.com/Farris-Abuhadba/bookworm.git
-```
+### Home
 
-### Run
+![Homepage](demo/homepage.png)
 
-```bash
-  npm install  # Install dependencies
-  npm run dev  # Start server
-```
+### Search
+
+![Searchpage](demo/searchpage.png)
+
+### Novel Details
+
+![Novelpage](demo/novelpage.png)
+
+### Reading View
+
+A completely customizable chapter reader
+![Readingpage1](demo/readingpage1.png)
+![Readingpage2](demo/readingpage2.png)
+![Readingpage3](demo/readingpage3.png)
